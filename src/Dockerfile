@@ -28,7 +28,7 @@ WORKDIR /crc/auxil-1.1
 RUN     python setup.py install   
 WORKDIR /crc 
 
-# add the iMad and radcal scripts and startup command
+# add the Python scripts and set the startup command
 ENV     SCRIPTS_CHANGED 2014-09-29
 COPY    iMad.py /crc/iMad.py 
 COPY    radcal.py /crc/radcal.py
