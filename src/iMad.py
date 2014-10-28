@@ -67,9 +67,10 @@ For ENVI files, ext1 or ext2 is the empty string.
     fn2 = args[1]
     path = os.path.dirname(fn1)
     basename1 = os.path.basename(fn1)
-    root1, ext = os.path.splitext(basename1)
+    root1, ext1 = os.path.splitext(basename1)
     basename2 = os.path.basename(fn2)
-    outfn = 'imagery/MAD[%s-%s]%s'%(basename1,basename2,ext)
+    root2, ext2 = os.path.splitext(basename2)
+    outfn = path + '/' + 'MAD[%s-%s]%s'%(root1,root2,ext1)
     inDataset1 = gdal.Open(fn1,GA_ReadOnly)     
     inDataset2 = gdal.Open(fn2,GA_ReadOnly)
     cols = inDataset1.RasterXSize
@@ -78,9 +79,9 @@ For ENVI files, ext1 or ext2 is the empty string.
     cols2 = inDataset2.RasterXSize
     rows2 = inDataset2.RasterYSize    
     bands2 = inDataset2.RasterCount
-    if (rows != rows2) or (cols != cols2) or (bands != bands2):
+    if bands != bands2:
         sys.stderr.write("Size mismatch")
-        sys.exit(1)
+        sys.exit(1)                
     if pos is None:
         pos = range(1,bands+1) 
     else:
@@ -89,14 +90,15 @@ For ENVI files, ext1 or ext2 is the empty string.
         x0 = 0
         y0 = 0
     else:
-       x0,y0,cols,rows = dims        
-    print '========================='
-    print '       iMAD'
-    print '========================='
+        x0,y0,cols,rows = dims  
+    if (rows != rows2) or (cols != cols2):
+        sys.stderr.write("Size mismatch")
+        sys.exit(1)              
     print time.asctime()     
     print 'time1: '+fn1
     print 'time2: '+fn2   
     print 'Delta    [canonical correlations]'   
+    start = time.time()
 #  iteration of MAD    
     cpm = auxil.Cpm(2*bands)    
     delta = 1.0
@@ -119,8 +121,9 @@ For ENVI files, ext1 or ext2 is the empty string.
         for row in range(rows):
             for k in range(bands):
                 tile[:,k] = rasterBands1[k].ReadAsArray(x0,y0+row,cols,1)
-                tile[:,bands+k] = rasterBands2[k].ReadAsArray(x0,y0+row,cols,1)
-#          eliminate no-data pixels (assuming all zeroes)                  
+                tile[:,bands+k] = rasterBands2[k].ReadAsArray(0,row,cols,1)
+#          eliminate no-data pixels    
+            tile = np.nan_to_num(tile)              
             tst1 = np.sum(tile[:,0:bands],axis=1) 
             tst2 = np.sum(tile[:,bands::],axis=1) 
             idx1 = set(np.where(  (tst1>0)  )[0]) 
@@ -199,7 +202,7 @@ For ENVI files, ext1 or ext2 is the empty string.
     for row in range(rows):
         for k in range(bands):
             tile[:,k] = rasterBands1[k].ReadAsArray(x0,y0+row,cols,1)
-            tile[:,bands+k] = rasterBands2[k].ReadAsArray(x0,y0+row,cols,1)       
+            tile[:,bands+k] = rasterBands2[k].ReadAsArray(0,row,cols,1)       
         mads = np.asarray((tile[:,0:bands]-means1)*A - (tile[:,bands::]-means2)*B)
         chisqr = np.sum((mads/sigMADs)**2,axis=1) 
         for k in range(bands):
@@ -211,7 +214,7 @@ For ENVI files, ext1 or ext2 is the empty string.
     inDataset1 = None
     inDataset2 = None  
     print 'result written to: '+outfn
-    print '--------done---------------------'     
+    print 'elapsed time: %s'%str(time.time()-start)  
     
 if __name__ == '__main__':
     main()

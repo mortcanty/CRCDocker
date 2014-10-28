@@ -16,7 +16,7 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 
-import sys, os, getopt
+import sys, os, time, getopt
 from numpy import *
 from scipy import stats
 from osgeo import gdal
@@ -78,17 +78,16 @@ Note that, for ENVI format, ext is the empty string.
         path = os.path.dirname(fsfn)
         basename = os.path.basename(fsfn)
         root, ext = os.path.splitext(basename)
-        fsoutfn = path+'/'+root+'_norm'+ext
+        fsoutfn = path+'/'+root+'_norm_all'+ext
     path = os.path.dirname(imadfn)
     basename = os.path.basename(imadfn)
     root, ext = os.path.splitext(basename)
     b = root.find('[')
     e = root.find(']')
-    referencefn, targetfn = root[b+1:e].split('-')
-    referencefn = path+'/'+referencefn
-    root, ext = os.path.splitext(targetfn)
-    targetfn = path+'/'+targetfn
-    outfn = path+'/'+root+'_norm'+ext
+    referenceroot, targetroot = root[b+1:e].split('-')
+    referencefn = path + '/' + referenceroot + ext
+    targetfn = path + '/' + targetroot + ext
+    outfn = path + '/' + targetroot + '_norm' + ext
     imadDataset = gdal.Open(imadfn,GA_ReadOnly)    
     imadbands = imadDataset.RasterCount 
     cols = imadDataset.RasterXSize
@@ -96,14 +95,13 @@ Note that, for ENVI format, ext is the empty string.
     chisqr = imadDataset.GetRasterBand(imadbands).ReadAsArray(0,0,cols,rows).ravel()
     ncp = 1 - stats.chi2.cdf(chisqr,[imadbands-1])
     idx = where(ncp>ncpThresh)
-    print '========================================='
-    print '             RADCAL'
-    print '========================================='
+    print time.asctime() 
     print 'reference: '+referencefn
     print 'target   : '+targetfn   
     print 'no-change probability threshold: '+str(ncpThresh)
     print 'no-change pixels: '+str(len(idx[0]))
     print 'slope         intercept      correlation'   
+    start = time.time()
     referenceDataset = gdal.Open(referencefn,GA_ReadOnly)     
     targetDataset = gdal.Open(targetfn,GA_ReadOnly)   
     if pos is None:
@@ -122,16 +120,18 @@ Note that, for ENVI format, ext is the empty string.
         outDataset.SetProjection(projection)    
     aa = []
     bb = []  
+    j = 1
     for k in pos:
         x = referenceDataset.GetRasterBand(k).ReadAsArray(x0,y0,cols,rows).astype(float).ravel()
-        y = targetDataset.GetRasterBand(k).ReadAsArray(x0,y0,cols,rows).astype(float).ravel()
+        y = targetDataset.GetRasterBand(k).ReadAsArray(0,0,cols,rows).astype(float).ravel()
         b,a,R = orthoregress(y[idx],x[idx])
         print b,a,R
         aa.append(a)
         bb.append(b)     
-        outBand = outDataset.GetRasterBand(k)
+        outBand = outDataset.GetRasterBand(j)
         outBand.WriteArray(resize(a+b*y,(rows,cols)),0,0) 
         outBand.FlushCache()
+        j += 1
     outDataset = None
     print 'result written to: '+outfn 
     if fsfn is not None:
@@ -141,23 +141,25 @@ Note that, for ENVI format, ext is the empty string.
         rows = fsDataset.RasterYSize    
         bands = fsDataset.RasterCount
         driver = fsDataset.GetDriver()
-        outDataset = driver.Create(fsoutfn,cols,rows,bands,GDT_Float32)
+        outDataset = driver.Create(fsoutfn,cols,rows,len(pos),GDT_Float32)
         projection = fsDataset.GetProjection()
         geotransform = fsDataset.GetGeoTransform()
         if geotransform is not None:
             outDataset.SetGeoTransform(geotransform)
         if projection is not None:
             outDataset.SetProjection(projection) 
+        j = 1    
         for k in pos:
             inBand = fsDataset.GetRasterBand(k)
-            outBand = outDataset.GetRasterBand(k)
+            outBand = outDataset.GetRasterBand(j)
             for i in range(rows):
                 y = inBand.ReadAsArray(0,i,cols,1)
-                outBand.WriteArray(aa[k-1]+bb[k-1]*y,0,i) 
-            outBand.FlushCache()       
+                outBand.WriteArray(aa[j-1]+bb[j-1]*y,0,i) 
+            outBand.FlushCache()  
+            j += 1     
         outDataset = None    
-        print 'result written to: '+fsoutfn
-    print '-------done-----------------------------'
+        print 'full result written to: '+fsoutfn
+    print 'elapsed time: %s'%str(time.time()-start)
     
 if __name__ == '__main__':
     main()        
