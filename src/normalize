@@ -36,7 +36,7 @@ then
 	echo "Radiometric normalization ..."
 	norm=$(python /crc/radcal.py -p $2 $mad | tee /dev/tty \
 	   | grep written \
-	   | awk '{print $4}' )be a quoted list
+	   | awk '{print $4}' )
 	echo "----------------------------"   
 elif [ $# -eq 5 ]
 then
