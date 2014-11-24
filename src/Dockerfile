@@ -29,7 +29,7 @@ RUN     python setup.py install
 WORKDIR /crc 
 
 # add the Python scripts and set the startup command
-ENV     SCRIPTS_CHANGED 2014-11-24a
+ENV     SCRIPTS_CHANGED 2014-11-24b
 COPY    iMad.py /crc/iMad.py 
 COPY    radcal.py /crc/radcal.py
 COPY    em.py /crc/em.py
