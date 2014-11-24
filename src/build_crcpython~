@@ -1,7 +1,0 @@
-#!/bin/sh
-cp ~/shared/python/CRCDocker/src/iMad.py iMad.py
-cp ~/shared/python/CRCDocker/src/radcal.py radcal.py
-cp ~/shared/python/CRCDocker/src/em.py em.py
-cp ~/shared/python/CRCDocker/src/register.py register.py
-cp ~/shared/python/CRC/provmeans/prov_means.c prov_means.c
-docker build -t mort/crcpython . 

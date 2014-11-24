@@ -29,10 +29,12 @@ RUN     python setup.py install
 WORKDIR /crc 
 
 # add the Python scripts and set the startup command
-ENV     SCRIPTS_CHANGED 2014-10-28f
+ENV     SCRIPTS_CHANGED 2014-11-24
 COPY    iMad.py /crc/iMad.py 
 COPY    radcal.py /crc/radcal.py
 COPY    em.py /crc/em.py
 COPY    register.py /crc/register.py
+COPY    atwt.py /crc/atwt.py
+COPY    dwt.py /crc/dwt.py
 COPY    normalize /crc/normalize
 CMD     ["/bin/bash"]

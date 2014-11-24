@@ -84,7 +84,6 @@ dimensions of the reference image.
     inDataset2 = gdal.Open(fn2,GA_ReadOnly)
     cols1 = inDataset1.RasterXSize
     rows1 = inDataset1.RasterYSize    
-    bands1 = inDataset1.RasterCount
     cols2 = inDataset2.RasterXSize
     rows2 = inDataset2.RasterYSize    
     bands2 = inDataset2.RasterCount    
