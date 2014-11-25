@@ -1,6 +1,6 @@
 CRCDocker
 =========
-Source files for the Docker image mort/crcpython
+Source files for the Docker image mort/crcdocker
 
 Command line versions of several Python scripts for the textbook "Image Analysis, Classification and Change Detection in Remote Sensing"
 
