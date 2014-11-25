@@ -6,9 +6,9 @@ Command line versions of several Python scripts for the textbook "Image Analysis
 
 On Ubuntu, for example, pull and run the container with
 
-sudo docker run -i -t -v <my images>:/crc/imagery/ –name=crc mort/crcpython
+sudo docker run -i -t -v my_images:/crc/imagery/ –name=crc mort/crcdocker
 
-This maps the host directory <my images> to the container directory /crc/imagery/
+This maps the host directory my_images to the container directory /crc/imagery/
 
 In the container, get help with
 
