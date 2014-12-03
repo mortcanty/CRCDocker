@@ -6,7 +6,7 @@ Command line versions of several Python scripts for the textbook "Image Analysis
 
 On Ubuntu, for example, pull and run the container with
 
-sudo docker run -d -p 433:888 -v my_images:/crc/imagery/ –name=crc mort/crcdocker
+sudo docker run -d -p 433:8888 -v my_images:/crc/imagery/ –name=crc mort/crcdocker
 
 This maps the host directory my_images to the container directory /crc/imagery/ and runs the
 container as a daemon which is serving iPython notebooks. 
@@ -14,6 +14,8 @@ container as a daemon which is serving iPython notebooks.
 Point your browser to http://localhost:433 to see the iPython notebook home page. 
 
 Open a new notebook and get help with
+
+run dispms.py -h (Display multispectral images - Chapter 1)
 
 run iMad.py -h  (IR-MAD algorithm for change detection - Chapter 9)
 
