@@ -19,6 +19,7 @@
 
 import auxil.auxil as auxil   
 import numpy as np    
+import matplotlib.pyplot as plt
 from scipy import linalg, stats 
 from osgeo import gdal
 from osgeo.gdalconst import GA_ReadOnly, GDT_Float32
@@ -37,7 +38,7 @@ e.g., -p "[1,2,3]" -d "[0,0,400,400]"
 The output MAD variate file is has the same format
 as filename1 and is named
 
-      path/MAD[filebasename1-filebasename2].ext1
+      path/MAD(filebasename1-filebasename2).ext1
       
 where filename1 = path/filebasename1.ext1
       filename2 = path/filebasename2.ext2
@@ -51,7 +52,7 @@ For ENVI files, ext1 or ext2 is the empty string.
     for option, value in options:
         if option == '-h':
             print usage
-            sys.exit(1) 
+            return
         elif option == '-p':
             pos = eval(value)
         elif option == '-d':
@@ -61,7 +62,7 @@ For ENVI files, ext1 or ext2 is the empty string.
     if len(args) != 2:
         print 'Incorrect number of arguments'
         print usage
-        sys.exit(1)                                    
+        return                                    
     gdal.AllRegister()
     fn1 = args[0]
     fn2 = args[1]
@@ -70,7 +71,7 @@ For ENVI files, ext1 or ext2 is the empty string.
     root1, ext1 = os.path.splitext(basename1)
     basename2 = os.path.basename(fn2)
     root2, ext2 = os.path.splitext(basename2)
-    outfn = path + '/' + 'MAD[%s-%s]%s'%(root1,root2,ext1)
+    outfn = path + '/' + 'MAD(%s-%s)%s'%(root1,root2,ext1)
     inDataset1 = gdal.Open(fn1,GA_ReadOnly)     
     inDataset2 = gdal.Open(fn2,GA_ReadOnly)
     cols = inDataset1.RasterXSize
@@ -93,11 +94,11 @@ For ENVI files, ext1 or ext2 is the empty string.
         x0,y0,cols,rows = dims  
     if (rows != rows2) or (cols != cols2):
         sys.stderr.write("Size mismatch")
-        sys.exit(1)              
+        sys.exit(1)      
+    print '------------IRMAD -------------'
     print time.asctime()     
     print 'time1: '+fn1
     print 'time2: '+fn2   
-    print 'Delta    [canonical correlations]'   
     start = time.time()
 #  iteration of MAD    
     cpm = auxil.Cpm(2*bands)    
@@ -112,6 +113,7 @@ For ENVI files, ext1 or ext2 is the empty string.
     B = 0
     rasterBands1 = []
     rasterBands2 = [] 
+    rhos = np.zeros((niter,bands))
     for b in pos:
         rasterBands1.append(inDataset1.GetRasterBand(b)) 
     for b in pos:
@@ -170,7 +172,7 @@ For ENVI files, ext1 or ext2 is the empty string.
         sigma = np.sqrt( 2*(1-rho ) )
 #      stopping criterion
         delta = max(abs(rho-oldrho))
-        print delta,rho 
+        rhos[itr,:] = rho
         oldrho = rho  
 #      tile the sigmas and means             
         sigMADs = np.tile(sigma,(cols,1)) 
@@ -183,7 +185,8 @@ For ENVI files, ext1 or ext2 is the empty string.
 #      ensure positive correlation between each pair of canonical variates        
         cov = np.diag(A.T*s12*B)    
         B = B*np.diag(cov/np.abs(cov))          
-        itr += 1                 
+        itr += 1              
+    print 'rho: %s'%str(rho)          
 # write results to disk
     driver = inDataset1.GetDriver()    
     outDataset = driver.Create(outfn,cols,rows,bands+1,GDT_Float32)
@@ -214,7 +217,11 @@ For ENVI files, ext1 or ext2 is the empty string.
     inDataset1 = None
     inDataset2 = None  
     print 'result written to: '+outfn
-    print 'elapsed time: %s'%str(time.time()-start)  
+    print 'elapsed time: %s'%str(time.time()-start) 
+    x = np.array(range(itr-1))
+    plt.plot(x,rhos[0:itr-1,:])
+    plt.title('Canonical correlations')
+    plt.show()  
     
 if __name__ == '__main__':
     main()

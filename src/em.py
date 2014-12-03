@@ -131,7 +131,7 @@ and the class probabilities output file is named
     for option, value in options:
         if option == '-h':
             print usage
-            sys.exit(1) 
+            return
         elif option == '-p':
             pos = eval(value)
         elif option == '-d':

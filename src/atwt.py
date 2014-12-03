@@ -45,7 +45,7 @@ Outfile name is msfilename_pan with same format as msfilename
     for option, value in options:
         if option == '-h':
             print usage
-            sys.exit(1) 
+            return 
         elif option == '-r':
             ratio = eval(value)
         elif option == '-d':

@@ -6,32 +6,35 @@ Command line versions of several Python scripts for the textbook "Image Analysis
 
 On Ubuntu, for example, pull and run the container with
 
-sudo docker run -i -t -v my_images:/crc/imagery/ –name=crc mort/crcdocker
+sudo docker run -d -p 433:888 -v my_images:/crc/imagery/ –name=crc mort/crcdocker
 
-This maps the host directory my_images to the container directory /crc/imagery/
+This maps the host directory my_images to the container directory /crc/imagery/ and runs the
+container as a daemon which is serving iPython notebooks. 
 
-In the container, get help with
+Point your browser to http://localhost:433 to see the iPython notebook home page. 
 
-python iMad.py -h  (IR-MAD algorithm for change detection - Chapter 9)
+Open a new notebook and get help with
 
-python radcal.py -h (Automatic relative radiometric normalization -Chapter 9)
+run iMad.py -h  (IR-MAD algorithm for change detection - Chapter 9)
 
-python em.py -h (Gaussian mixture clustering with the expectation maximization algorithm -Chapter 8)
+run radcal.py -h (Automatic relative radiometric normalization -Chapter 9)
 
-python register.py -h (Image-image co-registration in the spatial frequency domain - Chapter 5)
+run em.py -h (Gaussian mixture clustering with the expectation maximization algorithm -Chapter 8)
 
-python atwt.py -h (A-trous wavelet transform image fusion - Chapter 5)
+run register.py -h (Image-image co-registration in the spatial frequency domain - Chapter 5)
 
-python dwt.py -h (Discrete wavelet transform image fusion -Chapter 5)
+run atwt.py -h (A-trous wavelet transform image fusion - Chapter 5)
+
+run dwt.py -h (Discrete wavelet transform image fusion -Chapter 5)
 
 To carry out automatic radiometric normalization of full scenes (e.g. Landsat TM) run the bash script normalize:
 
 Usage:
 
-./normalize warpbandnumber spectral_subset referencefile targetfile [spatial_subset]
+run ./normalize warpbandnumber spectral_subset referencefile targetfile [spatial_subset]
 
 Only the spatial subset is optional.
 
 Spectral and spatial subsets must be lists, e.g., for Landsat images:
 
-./ normalize 4 [1,2,3,4,5,7] reference.tif target.tif [500,500,2000,2000]
+run ./ normalize 4 [1,2,3,4,5,7] reference.tif target.tif [500,500,2000,2000]

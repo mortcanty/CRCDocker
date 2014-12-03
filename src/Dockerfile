@@ -1,16 +1,21 @@
 FROM     debian:jessie
 MAINTAINER Mort Canty "mort.canty@gmail.com"
-ENV     REFRESHED_AT 2014-09-29
+ENV     REFRESHED_AT 2014-12-3b
 RUN apt-get update && apt-get install -y \
     python \
     build-essential \
     make \
     gcc \
+    pandoc \
     python-dev \
-    python-pip
+    python-pygments \
+    python-pip 
 
-# install python environment for iMad
-RUN     apt-get -y install python-numpy python-scipy python-gdal
+# ipython notebook
+RUN     pip install "ipython[notebook]"
+
+# install python environment for crc scripts
+RUN     apt-get -y install python-numpy python-scipy python-gdal python-matplotlib
 
 # packages imported by auxil package (but not used)
 RUN     apt-get -y install python-tk
@@ -28,8 +33,14 @@ WORKDIR /crc/auxil-1.1
 RUN     python setup.py install   
 WORKDIR /crc 
 
+# ipython notebook startup script
+ADD     notebook.sh /
+RUN     chmod u+x /notebook.sh
+
+EXPOSE 8888
+
 # add the Python scripts and set the startup command
-ENV     SCRIPTS_CHANGED 2014-11-24c
+ENV     SCRIPTS_CHANGED 2014-12-3f
 COPY    iMad.py /crc/iMad.py 
 COPY    radcal.py /crc/radcal.py
 COPY    em.py /crc/em.py
@@ -37,4 +48,5 @@ COPY    register.py /crc/register.py
 COPY    atwt.py /crc/atwt.py
 COPY    dwt.py /crc/dwt.py
 COPY    normalize /crc/normalize
-CMD     ["/bin/bash"]
+COPY    dispms.py /crc/dispms.py
+CMD     ["/notebook.sh"]

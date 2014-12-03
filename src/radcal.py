@@ -38,7 +38,7 @@ SpatialDimensions MUST match those of imadFile
 spectral dimension of fullSceneFile, if present,
 MUST match those of target and reference images
 --------------------------------------------------------
-imadFile is of form path/MAD[filename1-filename2].ext and
+imadFile is of form path/MAD(filename1-filename2).ext and
 the output file is named 
 
             path/filename2_norm.ext.
@@ -61,7 +61,7 @@ Note that, for ENVI format, ext is the empty string.
     for option, value in options:
         if option == '-h':
             print usage
-            sys.exit(1) 
+            return 
         elif option == '-p':
             pos = eval(value)
         elif option == '-d':
@@ -82,8 +82,8 @@ Note that, for ENVI format, ext is the empty string.
     path = os.path.dirname(imadfn)
     basename = os.path.basename(imadfn)
     root, ext = os.path.splitext(basename)
-    b = root.find('[')
-    e = root.find(']')
+    b = root.find('(')
+    e = root.find(')')
     referenceroot, targetroot = root[b+1:e].split('-')
     referencefn = path + '/' + referenceroot + ext
     targetfn = path + '/' + targetroot + ext
