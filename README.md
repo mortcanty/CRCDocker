@@ -39,4 +39,4 @@ Only the spatial subset is optional.
 
 Spectral and spatial subsets must be lists, e.g., for Landsat images:
 
-run ./ normalize 4 [1,2,3,4,5,7] reference.tif target.tif [500,500,2000,2000]
+!./ normalize 4 [1,2,3,4,5,7] reference.tif target.tif [500,500,2000,2000]
