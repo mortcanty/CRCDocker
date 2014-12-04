@@ -29,12 +29,12 @@ then
 	   | awk '{print $5}')
 	echo "----------------------------"   
 	echo "IR-MAD ..."
-	mad=$(python /crc/iMad.py -p $2 $3 $warp | tee /dev/tty \
+	mad=$(python /crc/iMad.py -n -p $2 $3 $warp | tee /dev/tty \
 	   | grep written \
 	   | awk '{print $4}' )
 	echo "----------------------------"
 	echo "Radiometric normalization ..."
-	norm=$(python /crc/radcal.py -p $2 $mad | tee /dev/tty \
+	norm=$(python /crc/radcal.py -n -p $2 $mad | tee /dev/tty \
 	   | grep written \
 	   | awk '{print $4}' )
 	echo "----------------------------"   
@@ -47,12 +47,12 @@ then
 	   | awk '{print $5}')
 	echo "----------------------------"   
 	echo "IR-MAD ..."
-	mad=$(python /crc/iMad.py -d $5 -p $2 $3 $warp | tee /dev/tty \
+	mad=$(python /crc/iMad.py -n -d $5 -p $2 $3 $warp | tee /dev/tty \
 	   | grep written \
 	   | awk '{print $4}' )
 	echo "----------------------------"
 	echo "Radiometric normalization ..."
-	norm=$(python /crc/radcal.py -d $5 -p $2 $mad $4 | tee /dev/tty \
+	norm=$(python /crc/radcal.py -n -d $5 -p $2 $mad $4 | tee /dev/tty \
 	   | grep full \
 	   | awk '{print $5}' )
 	echo "----------------------------"   

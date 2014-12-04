@@ -20,6 +20,7 @@ import sys, os, time, getopt
 from numpy import *
 from scipy import stats
 from osgeo import gdal
+import matplotlib.pyplot as plt
 from osgeo.gdalconst import GA_ReadOnly, GDT_Float32
 from auxil.auxil import orthoregress
 
@@ -53,15 +54,18 @@ name the normalized full scene, if present:
 Note that, for ENVI format, ext is the empty string.
 -------------------------------------------------------'''%sys.argv[0]
 
-    options, args = getopt.getopt(sys.argv[1:],'hp:d:t:')
+    options, args = getopt.getopt(sys.argv[1:],'hnp:d:t:')
     pos = None
     dims = None
     ncpThresh = 0.95  
-    fsfn = None          
+    fsfn = None  
+    graphics = True        
     for option, value in options:
         if option == '-h':
             print usage
             return 
+        elif option == '-n':
+            graphics = False
         elif option == '-p':
             pos = eval(value)
         elif option == '-d':
@@ -99,8 +103,7 @@ Note that, for ENVI format, ext is the empty string.
     print 'reference: '+referencefn
     print 'target   : '+targetfn   
     print 'no-change probability threshold: '+str(ncpThresh)
-    print 'no-change pixels: '+str(len(idx[0]))
-    print 'slope         intercept      correlation'   
+    print 'no-change pixels: '+str(len(idx[0]))  
     start = time.time()
     referenceDataset = gdal.Open(referencefn,GA_ReadOnly)     
     targetDataset = gdal.Open(targetfn,GA_ReadOnly)   
@@ -120,18 +123,32 @@ Note that, for ENVI format, ext is the empty string.
         outDataset.SetProjection(projection)    
     aa = []
     bb = []  
+    if graphics:
+        fig = plt.figure(1,(9,6))
     j = 1
     for k in pos:
         x = referenceDataset.GetRasterBand(k).ReadAsArray(x0,y0,cols,rows).astype(float).ravel()
         y = targetDataset.GetRasterBand(k).ReadAsArray(0,0,cols,rows).astype(float).ravel()
         b,a,R = orthoregress(y[idx],x[idx])
-        print b,a,R
+        print 'band: %i  slope: %f  intercept: %f  correlation: %f'%(k,b,a,R)
+        my = max(y[idx])
+        if (j<7) and graphics:
+            plt.subplot(2,3,j)
+            plt.plot(y[idx],x[idx],'.')
+            plt.plot([0,my],[a,a+b*my])
+            plt.title('Band %i'%k)
+            plt.xlabel('Target')
+            if (j==1) or (j==4):
+                plt.ylabel('Reference')
         aa.append(a)
         bb.append(b)     
         outBand = outDataset.GetRasterBand(j)
         outBand.WriteArray(resize(a+b*y,(rows,cols)),0,0) 
         outBand.FlushCache()
         j += 1
+    if graphics:
+        plt.show() 
+        plt.close()   
     outDataset = None
     print 'result written to: '+outfn 
     if fsfn is not None:

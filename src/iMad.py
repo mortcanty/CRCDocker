@@ -45,14 +45,17 @@ where filename1 = path/filebasename1.ext1
 
 For ENVI files, ext1 or ext2 is the empty string.       
 -----------------------------------------------------''' %sys.argv[0]
-    options, args = getopt.getopt(sys.argv[1:],'hp:i:d:')
+    options, args = getopt.getopt(sys.argv[1:],'hnp:i:d:')
     pos = None
     dims = None  
-    niter = 50          
+    niter = 50  
+    graphics = True        
     for option, value in options:
         if option == '-h':
             print usage
             return
+        elif option == '-n':
+            graphics = False
         elif option == '-p':
             pos = eval(value)
         elif option == '-d':
@@ -219,9 +222,10 @@ For ENVI files, ext1 or ext2 is the empty string.
     print 'result written to: '+outfn
     print 'elapsed time: %s'%str(time.time()-start) 
     x = np.array(range(itr-1))
-    plt.plot(x,rhos[0:itr-1,:])
-    plt.title('Canonical correlations')
-    plt.show()  
+    if graphics:
+        plt.plot(x,rhos[0:itr-1,:])
+        plt.title('Canonical correlations')
+        plt.show()  
     
 if __name__ == '__main__':
     main()
