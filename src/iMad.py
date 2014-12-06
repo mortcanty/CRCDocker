@@ -29,11 +29,12 @@ def main():
     usage = '''
 Usage:
 -----------------------------------------------------
-python %s [-i max iterations] [-p "bandPositions"] 
-[-d "spatialDimensions"] filename1 filename2
+python %s [-h] [-n] [-i max iterations] [-p bandPositions] 
+[-d spatialDimensions] filename1 filename2
 -----------------------------------------------------
-bandPositions and spatialDimensions are quoted lists, 
-e.g., -p "[1,2,3]" -d "[0,0,400,400]"
+bandPositions and spatialDimensions are lists, 
+e.g., -p [1,2,3] -d [0,0,400,400]
+-n stops any graphics output
 -----------------------------------------------------
 The output MAD variate file is has the same format
 as filename1 and is named

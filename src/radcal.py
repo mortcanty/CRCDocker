@@ -33,7 +33,8 @@ python %s  [-p "bandPositions"] [-d "spatialDimensions"]
 [-t no-change prob threshold] imadFile [fullSceneFile]' 
 --------------------------------------------------------
 bandPositions and spatialDimensions are quoted lists, 
-e.g., -p "[4,5,6]" -d "[0,0,400,400]"
+e.g., -p [4,5,6] -d [0,0,400,400]
+-n stops graphics output
 
 SpatialDimensions MUST match those of imadFile
 spectral dimension of fullSceneFile, if present,

@@ -96,7 +96,7 @@ def dispms(filename=None,dims=None,rgb=None,enhance=None):
 
 def main():
     usage = '''Usage: python %s [-f filename] [-p pos] [-d dims] [-e enhancement]
-                  RGB bandPositions and spatialDimensions are lists, e.g., -p [0,1,3] -d [0,0,400,400] \n
+                  RGB bandPositions and spatialDimensions are lists, e.g., -p [1,4,3] -d [0,0,400,400] \n
                   enhancements: 1=linear255 2=linear 3=linear2pc 4=equalization\n'''%sys.argv[0]
     options,args = getopt.getopt(sys.argv[1:],'hf:p:d:e:')
     filename = None

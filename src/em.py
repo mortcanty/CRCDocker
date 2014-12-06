@@ -109,8 +109,8 @@ python %s  [-p "bandPositions"] [-d "spatialDimensions"]
 [-t initial annealing temperature] [-s spatial mixing factor] 
 [-P generate class probabilities image] filename
 --------------------------------------------------------
-bandPositions and spatialDimensions are quoted lists, 
-e.g., -p "[1,2,4]" -d "[0,0,400,400]"  
+bandPositions and spatialDimensions are lists, 
+e.g., -p [1,2,4] -d [0,0,400,400]  
 --------------------------------------------------------
 If the input file is named 
 
