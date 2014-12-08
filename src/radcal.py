@@ -94,9 +94,21 @@ Note that, for ENVI format, ext is the empty string.
     targetfn = path + '/' + targetroot + ext
     outfn = path + '/' + targetroot + '_norm' + ext
     imadDataset = gdal.Open(imadfn,GA_ReadOnly)    
-    imadbands = imadDataset.RasterCount 
-    cols = imadDataset.RasterXSize
-    rows = imadDataset.RasterYSize
+    try:
+        imadbands = imadDataset.RasterCount 
+        cols = imadDataset.RasterXSize
+        rows = imadDataset.RasterYSize
+    except Exception as e:
+        print 'Error: %s  --Image could not be read'%e
+        sys.exit(1)
+    referenceDataset = gdal.Open(referencefn,GA_ReadOnly)     
+    targetDataset = gdal.Open(targetfn,GA_ReadOnly)           
+    if pos is None:
+        pos = range(1,referenceDataset.RasterCount+1)      
+    if dims is None:
+        x0 = 0; y0 = 0
+    else:
+        x0,y0,cols,rows = dims          
     chisqr = imadDataset.GetRasterBand(imadbands).ReadAsArray(0,0,cols,rows).ravel()
     ncp = 1 - stats.chi2.cdf(chisqr,[imadbands-1])
     idx = where(ncp>ncpThresh)
@@ -105,15 +117,7 @@ Note that, for ENVI format, ext is the empty string.
     print 'target   : '+targetfn   
     print 'no-change probability threshold: '+str(ncpThresh)
     print 'no-change pixels: '+str(len(idx[0]))  
-    start = time.time()
-    referenceDataset = gdal.Open(referencefn,GA_ReadOnly)     
-    targetDataset = gdal.Open(targetfn,GA_ReadOnly)   
-    if pos is None:
-        pos = range(1,referenceDataset.RasterCount+1)      
-    if dims is None:
-        x0 = 0; y0 = 0
-    else:
-        x0,y0,cols,rows = dims                  
+    start = time.time()           
     driver = targetDataset.GetDriver()    
     outDataset = driver.Create(outfn,cols,rows,len(pos),GDT_Float32)
     projection = imadDataset.GetProjection()
@@ -125,8 +129,9 @@ Note that, for ENVI format, ext is the empty string.
     aa = []
     bb = []  
     if graphics:
-        fig = plt.figure(1,(9,6))
+        plt.figure(1,(9,6))
     j = 1
+    bands = len(pos)
     for k in pos:
         x = referenceDataset.GetRasterBand(k).ReadAsArray(x0,y0,cols,rows).astype(float).ravel()
         y = targetDataset.GetRasterBand(k).ReadAsArray(0,0,cols,rows).astype(float).ravel()
@@ -138,7 +143,8 @@ Note that, for ENVI format, ext is the empty string.
             plt.plot(y[idx],x[idx],'.')
             plt.plot([0,my],[a,a+b*my])
             plt.title('Band %i'%k)
-            plt.xlabel('Target')
+            if ((j<4) and (bands<4)) or j>3:
+                plt.xlabel('Target')
             if (j==1) or (j==4):
                 plt.ylabel('Reference')
         aa.append(a)
@@ -155,9 +161,12 @@ Note that, for ENVI format, ext is the empty string.
     if fsfn is not None:
         print 'normalizing '+fsfn+'...'
         fsDataset = gdal.Open(fsfn,GA_ReadOnly)
-        cols = fsDataset.RasterXSize
-        rows = fsDataset.RasterYSize    
-        bands = fsDataset.RasterCount
+        try:
+            cols = fsDataset.RasterXSize
+            rows = fsDataset.RasterYSize    
+        except Exception as e:
+            print 'Error %s  -- Image could not be read in' 
+            sys.exit(1)   
         driver = fsDataset.GetDriver()
         outDataset = driver.Create(fsoutfn,cols,rows,len(pos),GDT_Float32)
         projection = fsDataset.GetProjection()

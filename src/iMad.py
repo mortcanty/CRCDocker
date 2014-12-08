@@ -17,7 +17,7 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 
-import auxil.auxil as auxil   
+import auxil.auxil as auxil    
 import numpy as np    
 import matplotlib.pyplot as plt
 from scipy import linalg, stats 
@@ -75,15 +75,19 @@ For ENVI files, ext1 or ext2 is the empty string.
     root1, ext1 = os.path.splitext(basename1)
     basename2 = os.path.basename(fn2)
     root2, ext2 = os.path.splitext(basename2)
-    outfn = path + '/' + 'MAD(%s-%s)%s'%(root1,root2,ext1)
+    outfn = path + '/' + 'MAD(%s-%s)%s'%(root1,root2,ext1)     
     inDataset1 = gdal.Open(fn1,GA_ReadOnly)     
-    inDataset2 = gdal.Open(fn2,GA_ReadOnly)
-    cols = inDataset1.RasterXSize
-    rows = inDataset1.RasterYSize    
-    bands = inDataset1.RasterCount
-    cols2 = inDataset2.RasterXSize
-    rows2 = inDataset2.RasterYSize    
-    bands2 = inDataset2.RasterCount
+    inDataset2 = gdal.Open(fn2,GA_ReadOnly) 
+    try:   
+        cols = inDataset1.RasterXSize
+        rows = inDataset1.RasterYSize    
+        bands = inDataset1.RasterCount
+        cols2 = inDataset2.RasterXSize
+        rows2 = inDataset2.RasterYSize    
+        bands2 = inDataset2.RasterCount
+    except Exception as e:
+        print 'Error: %s  --Images could not be read.'%e
+        sys.exit(1)     
     if bands != bands2:
         sys.stderr.write("Size mismatch")
         sys.exit(1)                
@@ -95,10 +99,7 @@ For ENVI files, ext1 or ext2 is the empty string.
         x0 = 0
         y0 = 0
     else:
-        x0,y0,cols,rows = dims  
-    if (rows != rows2) or (cols != cols2):
-        sys.stderr.write("Size mismatch")
-        sys.exit(1)      
+        x0,y0,cols,rows = dims       
     print '------------IRMAD -------------'
     print time.asctime()     
     print 'time1: '+fn1

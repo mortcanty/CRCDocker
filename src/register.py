@@ -82,11 +82,15 @@ dimensions of the reference image.
     outfn = path2 + '/' + root2 + '_warp' + ext2
     inDataset1 = gdal.Open(fn1,GA_ReadOnly)     
     inDataset2 = gdal.Open(fn2,GA_ReadOnly)
-    cols1 = inDataset1.RasterXSize
-    rows1 = inDataset1.RasterYSize    
-    cols2 = inDataset2.RasterXSize
-    rows2 = inDataset2.RasterYSize    
-    bands2 = inDataset2.RasterCount    
+    try:
+        cols1 = inDataset1.RasterXSize
+        rows1 = inDataset1.RasterYSize    
+        cols2 = inDataset2.RasterXSize
+        rows2 = inDataset2.RasterYSize    
+        bands2 = inDataset2.RasterCount   
+    except Exception as e:
+        print 'Error %s  --Image could not be read in'%e
+        sys.exit(1)     
     if dims1 is None:
         x0 = 0
         y0 = 0

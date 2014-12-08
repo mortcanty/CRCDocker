@@ -173,13 +173,14 @@ and the class probabilities output file is named
     infile = args[0]
     
     gdal.AllRegister() 
-    if infile:                   
+    try:                   
         inDataset = gdal.Open(infile,GA_ReadOnly)     
         cols = inDataset.RasterXSize
         rows = inDataset.RasterYSize    
         bands = inDataset.RasterCount
-    else:
-        return
+    except Exception as e:
+        print 'Error: %s  --Image could not be read'%e
+        sys.exit(1)
     if pos is not None:
         bands = len(pos)
     else:

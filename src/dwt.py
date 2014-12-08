@@ -65,9 +65,13 @@ Outfile name is msfilename_pan with same format as msfilename
     outfile = '%s/%s_pan%s'%(path,root1,ext1)       
 #  MS image    
     inDataset1 = gdal.Open(file1,GA_ReadOnly)     
-    cols = inDataset1.RasterXSize
-    rows = inDataset1.RasterYSize    
-    bands = inDataset1.RasterCount
+    try:    
+        cols = inDataset1.RasterXSize
+        rows = inDataset1.RasterYSize    
+        bands = inDataset1.RasterCount
+    except Exception as e:
+        print 'Error: %e --Image could not be read'%e
+        sys.exit(1)    
     if pos1 is None:
         pos1 = range(1,bands+1)
     num_bands = len(pos1)    
@@ -76,15 +80,19 @@ Outfile name is msfilename_pan with same format as msfilename
     x10,y10,cols1,rows1 = dims1    
 #  PAN image    
     inDataset2 = gdal.Open(file2,GA_ReadOnly)     
-    bands = inDataset2.RasterCount  
+    try:  
+        bands = inDataset2.RasterCount
+    except Exception as e:
+        print 'Error: %e --Image could not be read'%e  
+        sys.exit(1)   
     if bands>1:
         print 'PAN image must be a single band'
-        return     
+        sys.exit(1)     
     geotransform1 = inDataset1.GetGeoTransform()
     geotransform2 = inDataset2.GetGeoTransform()   
     if (geotransform1 is None) or (geotransform2 is None):
         print 'Image not georeferenced, aborting' 
-        return       
+        sys.exit(1)      
     print '========================='
     print '   DWT Pansharpening'
     print '========================='
