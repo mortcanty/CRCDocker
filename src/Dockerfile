@@ -1,6 +1,6 @@
 FROM     debian:jessie
 MAINTAINER Mort Canty "mort.canty@gmail.com"
-ENV     REFRESHED_AT 2014-12-4
+ENV     REFRESHED_AT 2014-12-8
 RUN apt-get update && apt-get install -y \
     python \
     build-essential \
@@ -40,7 +40,7 @@ RUN     chmod u+x /notebook.sh
 EXPOSE 8888
 
 # add the Python scripts and set the startup command
-ENV     SCRIPTS_CHANGED 2014-12-8c
+ENV     SCRIPTS_CHANGED 2014-12-8g
 COPY    iMad.py /crc/iMad.py 
 COPY    radcal.py /crc/radcal.py
 COPY    em.py /crc/em.py
@@ -49,4 +49,5 @@ COPY    atwt.py /crc/atwt.py
 COPY    dwt.py /crc/dwt.py
 COPY    normalize /crc/normalize
 COPY    dispms.py /crc/dispms.py
+COPY    pca.py /crc/pca.py
 CMD     ["/notebook.sh"]
