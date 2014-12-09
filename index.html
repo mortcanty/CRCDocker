@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Crcdocker : Python Scripts for Image Analysis, Classification and Change Detection in Remote Sensing">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Crcdocker</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/mortcanty/CRCDocker">View on GitHub</a>
+
+          <h1 id="project_title">Crcdocker</h1>
+          <h2 id="project_tagline">Python Scripts for Image Analysis, Classification and Change Detection in Remote Sensing</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/mortcanty/CRCDocker/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/mortcanty/CRCDocker/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a id="crcdocker" class="anchor" href="#crcdocker" aria-hidden="true"><span class="octicon octicon-link"></span></a>CRCDocker</h1>
+
+<p>Source files for the Docker image mort/crcdocker</p>
+
+<p>Command line versions of several Python scripts for the textbook "Image Analysis, Classification and Change Detection in Remote Sensing"</p>
+
+<p>On Ubuntu, for example, pull and run the container with</p>
+
+<p>sudo docker run -d -p 433:8888 -v my_images:/crc/imagery/ –name=crc mort/crcdocker</p>
+
+<p>This maps the host directory my_images to the container directory /crc/imagery/ and runs the
+container as a daemon which is serving iPython notebooks. </p>
+
+<p>Point your browser to http://localhost:433 to see the iPython notebook home page. </p>
+
+<p>Open a new notebook and get help with</p>
+
+<p>run dispms.py -h (Display multispectral images - Chapter 1)</p>
+
+<p>run iMad.py -h  (IR-MAD algorithm for change detection - Chapter 9)</p>
+
+<p>run radcal.py -h (Automatic relative radiometric normalization -Chapter 9)</p>
+
+<p>run em.py -h (Gaussian mixture clustering with the expectation maximization algorithm -Chapter 8)</p>
+
+<p>run register.py -h (Image-image co-registration in the spatial frequency domain - Chapter 5)</p>
+
+<p>run atwt.py -h (A-trous wavelet transform image fusion - Chapter 5)</p>
+
+<p>run dwt.py -h (Discrete wavelet transform image fusion -Chapter 5)</p>
+
+<p>To carry out automatic radiometric normalization of full scenes (e.g. Landsat TM) run the bash script normalize:</p>
+
+<p>Usage:</p>
+
+<p>run ./normalize warpbandnumber spectral_subset referencefile targetfile [spatial_subset]</p>
+
+<p>Only the spatial subset is optional.</p>
+
+<p>Spectral and spatial subsets must be lists, e.g., for Landsat images:</p>
+
+<p>!./ normalize 4 [1,2,3,4,5,7] reference.tif target.tif [500,500,2000,2000]</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Crcdocker maintained by <a href="https://github.com/mortcanty">mortcanty</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
