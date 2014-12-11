@@ -23,45 +23,7 @@ import  auxil.auxil as auxil
 import numpy as np
 from osgeo.gdalconst import GA_ReadOnly
 
-def dispms(filename=None,dims=None,rgb=None,enhance=None):
-    gdal.AllRegister()
-    if filename == None:        
-        filename = raw_input('Enter an image to display: ') 
-    try:                  
-        inDataset = gdal.Open(filename,GA_ReadOnly) 
-        cols = inDataset.RasterXSize    
-        rows = inDataset.RasterYSize    
-        bands = inDataset.RasterCount
-    except Exception as e:
-        print 'Error in dispms: %s'%e
-        return   
-    if dims == None:
-        dims = [0,0,cols,rows]
-    if dims:
-        x0,y0,cols,rows = dims
-    else:
-        return
-    if rgb == None:
-        rgb = [1,1,1]
-    if rgb:
-        r,g,b = rgb
-    else:
-        return
-    if enhance == None:
-        enhance = 3
-    if enhance == 1:
-        enhance = 'linear255'
-    elif enhance == 2:
-        enhance = 'linear'
-    elif enhance == 3:
-        enhance = 'linear2pc'
-    elif enhance == 4:
-        enhance = 'equalization'
-    else:
-        return    
-    redband   = inDataset.GetRasterBand(r).ReadAsArray(x0,y0,cols,rows)
-    greenband = inDataset.GetRasterBand(g).ReadAsArray(x0,y0,cols,rows)  
-    blueband  = inDataset.GetRasterBand(b).ReadAsArray(x0,y0,cols,rows)
+def make_image(redband,greenband,blueband,rows,cols,enhance):
     if str(redband.dtype) == 'uint8':
         dt = 1
     elif str(redband.dtype) == 'uint16':
@@ -87,19 +49,90 @@ def dispms(filename=None,dims=None,rgb=None,enhance=None):
     X[:,0] = np.float32(np.fromstring(r,dtype=np.uint8))
     X[:,1] = np.float32(np.fromstring(g,dtype=np.uint8))
     X[:,2] = np.float32(np.fromstring(b,dtype=np.uint8))
-    X = np.reshape(X,(rows,cols,3))/255.
-    f, ax = plt.subplots(figsize=(10,10))
-    ax.imshow(X)
-    ax.set_title(filename)
+    return np.reshape(X,(rows,cols,3))/255.
+
+def dispms(filename1=None,filename2=None,dims=None,rgb=None,enhance=None):
+    gdal.AllRegister()
+    if filename1 == None:        
+        filename1 = raw_input('Enter image filename: ')
+    inDataset1 = gdal.Open(filename1,GA_ReadOnly)    
+    try:                   
+        cols = inDataset1.RasterXSize    
+        rows = inDataset1.RasterYSize    
+    except Exception as e:
+        print 'Error in dispms: %s  --could not read image file'%e
+        return   
+    if filename2 is not None:                
+        inDataset2 = gdal.Open(filename2,GA_ReadOnly) 
+        try:                   
+            _ = inDataset2.RasterXSize       
+        except Exception as e:
+            print 'Error in dispms: %s  --could not read second image file'%e
+            return       
+    if dims == None:
+        dims = [0,0,cols,rows]
+    if dims:
+        x0,y0,cols,rows = dims
+    else:
+        return
+    if rgb == None:
+        rgb = [1,1,1]
+    if rgb:
+        r,g,b = rgb
+    else:
+        return
+    if enhance == None:
+        enhance = 3
+    if enhance == 1:
+        enhance = 'linear255'
+    elif enhance == 2:
+        enhance = 'linear'
+    elif enhance == 3:
+        enhance = 'linear2pc'
+    elif enhance == 4:
+        enhance = 'equalization'
+    else:
+        return  
+    try:  
+        redband   = inDataset1.GetRasterBand(r).ReadAsArray(x0,y0,cols,rows)
+        greenband = inDataset1.GetRasterBand(g).ReadAsArray(x0,y0,cols,rows)  
+        blueband  = inDataset1.GetRasterBand(b).ReadAsArray(x0,y0,cols,rows)
+        inDataset1 = None
+    except  Exception as e:
+        print 'Error in dispms: %s'%e  
+        return
+    X1 = make_image(redband,greenband,blueband,rows,cols,enhance)
+    if filename2 is not None:
+        try:  
+            redband   = inDataset2.GetRasterBand(r).ReadAsArray(x0,y0,cols,rows)
+            greenband = inDataset2.GetRasterBand(g).ReadAsArray(x0,y0,cols,rows)  
+            blueband  = inDataset2.GetRasterBand(b).ReadAsArray(x0,y0,cols,rows)
+            inDataset2 = None
+        except  Exception as e:
+            print 'Error in dispms: %s'%e  
+            return
+        X2 = make_image(redband,greenband,blueband,rows,cols,enhance)    
+        f, ax = plt.subplots(1,2,figsize=(20,10))
+        ax[0].imshow(X1)
+        ax[0].set_title(filename1)
+        ax[1].imshow(X2)
+        ax[1].set_title(filename2)
+    else:
+        f, ax = plt.subplots( figsize=(10,10))
+        ax.imshow(X1)
+        ax.set_title(filename1) 
     plt.show()
-                       
+                      
 
 def main():
-    usage = '''Usage: python %s [-f filename] [-p pos] [-d dims] [-e enhancement]
-                  RGB bandPositions and spatialDimensions are lists, e.g., -p [1,4,3] -d [0,0,400,400] \n
-                  enhancements: 1=linear255 2=linear 3=linear2pc 4=equalization\n'''%sys.argv[0]
-    options,args = getopt.getopt(sys.argv[1:],'hf:p:d:e:')
-    filename = None
+    usage = '''Usage: python %s [-f filename1] [-g filename2] [-p pos] [-d dims] [-e enhancement]\n
+            if -f is not specified it will be queried\n
+            if -g is specified, the same spatial dimensions and band positions are applied to both images\n
+            RGB bandPositions and spatialDimensions are lists, e.g., -p [1,4,3] -d [0,0,400,400] \n
+            enhancements: 1=linear255 2=linear 3=linear2pc 4=equalization\n'''%sys.argv[0]
+    options,args = getopt.getopt(sys.argv[1:],'hf:g:p:d:e:')
+    filename1 = None
+    filename2 = None
     dims = None
     rgb = None
     enhance = None   
@@ -108,14 +141,16 @@ def main():
             print usage
             return 
         elif option == '-f':
-            filename = str(value)
+            filename1 = value
+        elif option == '-g':
+            filename2 = value    
         elif option == '-p':
             rgb = tuple(eval(value))
         elif option == '-d':
             dims = eval(value) 
         elif option == '-e':
             enhance = eval(value)  
-    dispms(filename,dims,rgb,enhance)
+    dispms(filename1,filename2,dims,rgb,enhance)
 
 if __name__ == '__main__':
     main()
