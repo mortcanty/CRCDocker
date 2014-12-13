@@ -1,6 +1,6 @@
 FROM     debian:jessie
 MAINTAINER Mort Canty "mort.canty@gmail.com"
-ENV     REFRESHED_AT 2014-12-8
+ENV     REFRESHED_AT 2014-12-12a
 RUN apt-get update && apt-get install -y \
     python \
     build-essential \
@@ -40,7 +40,7 @@ RUN     chmod u+x /notebook.sh
 EXPOSE 8888
 
 # add the Python scripts and set the startup command
-ENV     SCRIPTS_CHANGED 2014-12-11l
+ENV     SCRIPTS_CHANGED 2014-12-13a
 COPY    iMad.py /crc/iMad.py 
 COPY    radcal.py /crc/radcal.py
 COPY    em.py /crc/em.py

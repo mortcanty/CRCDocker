@@ -72,7 +72,7 @@ Note that, for ENVI format, ext is the empty string.
         elif option == '-d':
             dims = eval(value) 
         elif option == '-t':
-            ncpThresh = value    
+            ncpThresh = eval(value)    
     if (len(args) != 1) and (len(args) != 2):
         print 'Incorrect number of arguments'
         print usage
@@ -134,7 +134,7 @@ Note that, for ENVI format, ext is the empty string.
     bands = len(pos)
     for k in pos:
         x = referenceDataset.GetRasterBand(k).ReadAsArray(x0,y0,cols,rows).astype(float).ravel()
-        y = targetDataset.GetRasterBand(k).ReadAsArray(0,0,cols,rows).astype(float).ravel()
+        y = targetDataset.GetRasterBand(k).ReadAsArray(x0,y0,cols,rows).astype(float).ravel()
         b,a,R = orthoregress(y[idx],x[idx])
         print 'band: %i  slope: %f  intercept: %f  correlation: %f'%(k,b,a,R)
         my = max(y[idx])
@@ -156,6 +156,8 @@ Note that, for ENVI format, ext is the empty string.
     if graphics:
         plt.show() 
         plt.close()   
+    referenceDataset = None
+    targetDataset = None
     outDataset = None
     print 'result written to: '+outfn 
     if fsfn is not None:
@@ -184,8 +186,9 @@ Note that, for ENVI format, ext is the empty string.
                 outBand.WriteArray(aa[j-1]+bb[j-1]*y,0,i) 
             outBand.FlushCache()  
             j += 1     
-        outDataset = None    
-        print 'full result written to: '+fsoutfn
+        outDataset = None   
+        fsDataset = None 
+        print 'full result written to: '+fsoutfn   
     print 'elapsed time: %s'%str(time.time()-start)
     
 if __name__ == '__main__':

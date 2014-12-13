@@ -99,7 +99,14 @@ For ENVI files, ext1 or ext2 is the empty string.
         x0 = 0
         y0 = 0
     else:
-        x0,y0,cols,rows = dims       
+        x0,y0,cols,rows = dims    
+# if second image is warped, assume it has same dimensions as dims        
+    if root2.find('_warp') != -1:
+        x2 = 0
+        y2 = 0   
+    else:
+        x2 = x0
+        y2 = y0    
     print '------------IRMAD -------------'
     print time.asctime()     
     print 'time1: '+fn1
@@ -128,7 +135,7 @@ For ENVI files, ext1 or ext2 is the empty string.
         for row in range(rows):
             for k in range(bands):
                 tile[:,k] = rasterBands1[k].ReadAsArray(x0,y0+row,cols,1)
-                tile[:,bands+k] = rasterBands2[k].ReadAsArray(0,row,cols,1)
+                tile[:,bands+k] = rasterBands2[k].ReadAsArray(x2,y2+row,cols,1)
 #          eliminate no-data pixels    
             tile = np.nan_to_num(tile)              
             tst1 = np.sum(tile[:,0:bands],axis=1) 
@@ -210,7 +217,7 @@ For ENVI files, ext1 or ext2 is the empty string.
     for row in range(rows):
         for k in range(bands):
             tile[:,k] = rasterBands1[k].ReadAsArray(x0,y0+row,cols,1)
-            tile[:,bands+k] = rasterBands2[k].ReadAsArray(0,row,cols,1)       
+            tile[:,bands+k] = rasterBands2[k].ReadAsArray(x2,y2+row,cols,1)       
         mads = np.asarray((tile[:,0:bands]-means1)*A - (tile[:,bands::]-means2)*B)
         chisqr = np.sum((mads/sigMADs)**2,axis=1) 
         for k in range(bands):
