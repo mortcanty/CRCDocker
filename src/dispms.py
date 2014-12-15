@@ -40,10 +40,14 @@ def make_image(redband,greenband,blueband,rows,cols,enhance):
     redband = redband.tostring()
     greenband = greenband.tostring()
     blueband = blueband.tostring()
+    if enhance == 'linear255':
+        rng = [0.0,255.0]
+    else:
+        rng = None
     if dt != 1: 
-        redband   = auxil.byte_stretch(redband,dtype=dt)
-        greenband = auxil.byte_stretch(greenband,dtype=dt)
-        blueband  = auxil.byte_stretch(blueband,dtype=dt)        
+        redband   = auxil.byte_stretch(redband,dtype=dt,rng=rng)
+        greenband = auxil.byte_stretch(greenband,dtype=dt,rng=rng)
+        blueband  = auxil.byte_stretch(blueband,dtype=dt,rng=rng)        
     r,g,b = auxil.stretch(redband,greenband,blueband,enhance)  
     X = np.zeros((rows*cols,3),dtype=np.float32)                                                                                                                 
     X[:,0] = np.float32(np.fromstring(r,dtype=np.uint8))
@@ -94,9 +98,9 @@ def dispms(filename1=None,filename2=None,dims=None,rgb=None,enhance=None):
     else:
         return  
     try:  
-        redband   = inDataset1.GetRasterBand(r).ReadAsArray(x0,y0,cols,rows)
-        greenband = inDataset1.GetRasterBand(g).ReadAsArray(x0,y0,cols,rows)  
-        blueband  = inDataset1.GetRasterBand(b).ReadAsArray(x0,y0,cols,rows)
+        redband   = np.nan_to_num(inDataset1.GetRasterBand(r).ReadAsArray(x0,y0,cols,rows))
+        greenband = np.nan_to_num(inDataset1.GetRasterBand(g).ReadAsArray(x0,y0,cols,rows)) 
+        blueband  = np.nan_to_num(inDataset1.GetRasterBand(b).ReadAsArray(x0,y0,cols,rows))
         inDataset1 = None
     except  Exception as e:
         print 'Error in dispms: %s'%e  
@@ -104,9 +108,9 @@ def dispms(filename1=None,filename2=None,dims=None,rgb=None,enhance=None):
     X1 = make_image(redband,greenband,blueband,rows,cols,enhance)
     if filename2 is not None:
         try:  
-            redband   = inDataset2.GetRasterBand(r).ReadAsArray(x0,y0,cols,rows)
-            greenband = inDataset2.GetRasterBand(g).ReadAsArray(x0,y0,cols,rows)  
-            blueband  = inDataset2.GetRasterBand(b).ReadAsArray(x0,y0,cols,rows)
+            redband   = np.nan_to_num(inDataset2.GetRasterBand(r).ReadAsArray(x0,y0,cols,rows))
+            greenband = np.nan_to_num(inDataset2.GetRasterBand(g).ReadAsArray(x0,y0,cols,rows))  
+            blueband  = np.nan_to_num(inDataset2.GetRasterBand(b).ReadAsArray(x0,y0,cols,rows))
             inDataset2 = None
         except  Exception as e:
             print 'Error in dispms: %s'%e  

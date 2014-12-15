@@ -15,9 +15,8 @@
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
-import auxil.auxil as auxil
 import numpy as np
-import os, sys, getopt
+import os, sys, getopt, time
 from osgeo import gdal
 import matplotlib.pyplot as plt
 from osgeo.gdalconst import GA_ReadOnly,GDT_Float32
@@ -26,7 +25,6 @@ def main():
     usage = '''Usage: python %s  [-d dims] fileName\n
             spatial dimension is a list, e.g., -d [0,0,400,400] \n'''%sys.argv[0]
     options,args = getopt.getopt(sys.argv[1:],'hnd:')
-    filename = None
     dims = None
     graphics = True
     for option, value in options: 
@@ -43,7 +41,10 @@ def main():
     basename = os.path.basename(infile)
     root, ext = os.path.splitext(basename)
     outfile = path+'/'+root+'_pca'+ext    
-    
+    print '------------PCA -------------'
+    print time.asctime()     
+    print 'Input '+infile
+    start = time.time()    
     
     inDataset = gdal.Open(infile,GA_ReadOnly)
     try:                         
@@ -103,6 +104,8 @@ def main():
         outBand.FlushCache() 
     outDataset = None    
     inDataset = None        
- 
+    print 'result written to: '+outfile
+    print 'elapsed time: %s'%str(time.time()-start) 
+     
 if __name__ == '__main__':
     main()    

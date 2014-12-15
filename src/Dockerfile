@@ -1,6 +1,6 @@
 FROM     debian:jessie
 MAINTAINER Mort Canty "mort.canty@gmail.com"
-ENV     REFRESHED_AT 2014-12-12a
+ENV     REFRESHED_AT 2014-12-15
 RUN apt-get update && apt-get install -y \
     python \
     build-essential \
@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y \
 RUN     pip install "ipython[notebook]"
 
 # install python environment for crc scripts
-RUN     apt-get -y install python-numpy python-scipy python-gdal python-matplotlib
+RUN     apt-get -y install python-numpy python-scipy python-gdal python-matplotlib gdal-bin
 
 # packages imported by auxil package (but not used)
 RUN     apt-get -y install python-tk
@@ -40,7 +40,7 @@ RUN     chmod u+x /notebook.sh
 EXPOSE 8888
 
 # add the Python scripts and set the startup command
-ENV     SCRIPTS_CHANGED 2014-12-13a
+ENV     SCRIPTS_CHANGED 2014-12-15b
 COPY    iMad.py /crc/iMad.py 
 COPY    radcal.py /crc/radcal.py
 COPY    em.py /crc/em.py
