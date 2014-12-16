@@ -40,7 +40,7 @@ RUN     chmod u+x /notebook.sh
 EXPOSE 8888
 
 # add the Python scripts and set the startup command
-ENV     SCRIPTS_CHANGED 2014-12-15b
+ENV     SCRIPTS_CHANGED 2014-12-15c
 COPY    iMad.py /crc/iMad.py 
 COPY    radcal.py /crc/radcal.py
 COPY    em.py /crc/em.py
