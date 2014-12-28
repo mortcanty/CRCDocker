@@ -197,9 +197,9 @@ and the class probabilities output file is named
     outfile = path+'/'+root+'_em'+ext
     if probs:
         probfile = path+'/'+root+'_emprobs'+ext
-    print '========================='
+    print '--------------------------'
     print '     EM clustering'
-    print '========================='
+    print '--------------------------'
     print 'infile:   %s'%infile
     print 'clusters: %i'%K
     print 'T0:       %f'%T0

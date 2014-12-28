@@ -22,10 +22,11 @@ import matplotlib.pyplot as plt
 from osgeo.gdalconst import GA_ReadOnly,GDT_Float32
 
 def main(): 
-    usage = '''Usage: python %s  [-d dims] fileName\n
+    usage = '''Usage: python %s  [-d dims] [-p pos] fileName\n
             spatial dimension is a list, e.g., -d [0,0,400,400] \n'''%sys.argv[0]
-    options,args = getopt.getopt(sys.argv[1:],'hnd:')
+    options,args = getopt.getopt(sys.argv[1:],'hnd:p:')
     dims = None
+    pos = None
     graphics = True
     for option, value in options: 
         if option == '-h':
@@ -35,15 +36,17 @@ def main():
             graphics = False
         elif option == '-d':
             dims = eval(value)  
+        elif option == '-p':
+            pos = eval(value)
     gdal.AllRegister()
     infile = args[0] 
     path = os.path.dirname(infile)
     basename = os.path.basename(infile)
     root, ext = os.path.splitext(basename)
     outfile = path+'/'+root+'_pca'+ext    
-    print '------------PCA -------------'
+    print '------------PCA ---------------'
     print time.asctime()     
-    print 'Input '+infile
+    print 'Input %s'%infile
     start = time.time()    
     
     inDataset = gdal.Open(infile,GA_ReadOnly)
@@ -59,10 +62,14 @@ def main():
     else:
         x0 = 0
         y0 = 0       
+    if pos is not None:
+        bands = len(pos)
+    else:
+        pos = range(1,bands+1)        
 #  data matrix
     G = np.zeros((rows*cols,bands)) 
-    k = 0                                   
-    for b in range(1,bands+1):
+    k = 0                               
+    for b in pos:
         band = inDataset.GetRasterBand(b)
         tmp = band.ReadAsArray(x0,y0,cols,rows)\
                               .astype(float).ravel()
@@ -76,6 +83,7 @@ def main():
     idx = np.argsort(lams)[::-1]
     lams = lams[idx]
     U = U[:,idx] 
+    print 'Eigenvalues: %s'%str(lams)
     if graphics: 
         plt.plot(range(1,bands+1),lams)
         plt.title(infile)
@@ -104,7 +112,7 @@ def main():
         outBand.FlushCache() 
     outDataset = None    
     inDataset = None        
-    print 'result written to: '+outfile
+    print 'result written to: %s'%outfile
     print 'elapsed time: %s'%str(time.time()-start) 
      
 if __name__ == '__main__':

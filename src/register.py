@@ -68,7 +68,9 @@ dimensions of the reference image.
     gdal.AllRegister()    
     fn1 = args[0]  # reference
     fn2 = args[1]  # warp  
-             
+    print '--------------------------------'
+    print'        Register'   
+    print'---------------------------------'      
     print time.asctime()     
     print 'reference image: '+fn1
     print 'warp image: '+fn2     

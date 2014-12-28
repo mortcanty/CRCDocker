@@ -55,36 +55,37 @@ def make_image(redband,greenband,blueband,rows,cols,enhance):
     X[:,2] = np.float32(np.fromstring(b,dtype=np.uint8))
     return np.reshape(X,(rows,cols,3))/255.
 
-def dispms(filename1=None,filename2=None,dims=None,rgb=None,enhance=None):
+def dispms(filename1=None,filename2=None,dims=None,DIMS=None,rgb=None,RGB=None,enhance=None):
     gdal.AllRegister()
     if filename1 == None:        
         filename1 = raw_input('Enter image filename: ')
     inDataset1 = gdal.Open(filename1,GA_ReadOnly)    
     try:                   
         cols = inDataset1.RasterXSize    
-        rows = inDataset1.RasterYSize    
+        rows = inDataset1.RasterYSize  
+        bands1 = inDataset1.RasterCount  
     except Exception as e:
         print 'Error in dispms: %s  --could not read image file'%e
         return   
     if filename2 is not None:                
         inDataset2 = gdal.Open(filename2,GA_ReadOnly) 
-        try:                   
-            _ = inDataset2.RasterXSize       
+        try:       
+            cols2 = inDataset2.RasterXSize    
+            rows2 = inDataset2.RasterYSize            
+            bands2 = inDataset2.RasterCount       
         except Exception as e:
             print 'Error in dispms: %s  --could not read second image file'%e
             return       
     if dims == None:
         dims = [0,0,cols,rows]
-    if dims:
-        x0,y0,cols,rows = dims
-    else:
-        return
+    x0,y0,cols,rows = dims
     if rgb == None:
         rgb = [1,1,1]
-    if rgb:
-        r,g,b = rgb
-    else:
-        return
+    r,g,b = rgb
+    r = np.min([r,bands1])
+    g = np.min([g,bands1])
+    b = np.min([b,bands1])
+    
     if enhance == None:
         enhance = 3
     if enhance == 1:
@@ -107,6 +108,15 @@ def dispms(filename1=None,filename2=None,dims=None,rgb=None,enhance=None):
         return
     X1 = make_image(redband,greenband,blueband,rows,cols,enhance)
     if filename2 is not None:
+        if DIMS == None:
+            DIMS = [0,0,cols2,rows2]
+        x0,y0,cols,rows = DIMS
+        if RGB == None:
+            RGB = [1,1,1]
+        r,g,b = RGB
+        r = np.min([r,bands2])
+        g = np.min([g,bands2])
+        b = np.min([b,bands2])
         try:  
             redband   = np.nan_to_num(inDataset2.GetRasterBand(r).ReadAsArray(x0,y0,cols,rows))
             greenband = np.nan_to_num(inDataset2.GetRasterBand(g).ReadAsArray(x0,y0,cols,rows))  
@@ -129,16 +139,17 @@ def dispms(filename1=None,filename2=None,dims=None,rgb=None,enhance=None):
                       
 
 def main():
-    usage = '''Usage: python %s [-f filename1] [-g filename2] [-p pos] [-d dims] [-e enhancement]\n
+    usage = '''Usage: python %s [-f filename1] [-g filename2] [-p posf] [P posg [-d dimsf] [-D dimsg] [-e enhancement]\n
             if -f is not specified it will be queried\n
-            if -g is specified, the same spatial dimensions and band positions are applied to both images\n
             RGB bandPositions and spatialDimensions are lists, e.g., -p [1,4,3] -d [0,0,400,400] \n
             enhancements: 1=linear255 2=linear 3=linear2pc 4=equalization\n'''%sys.argv[0]
-    options,args = getopt.getopt(sys.argv[1:],'hf:g:p:d:e:')
+    options,args = getopt.getopt(sys.argv[1:],'hf:g:p:P:d:D:e:')
     filename1 = None
     filename2 = None
     dims = None
     rgb = None
+    DIMS = None
+    RGB = None
     enhance = None   
     for option, value in options: 
         if option == '-h':
@@ -150,11 +161,15 @@ def main():
             filename2 = value    
         elif option == '-p':
             rgb = tuple(eval(value))
+        elif option == '-P':
+            RGB = tuple(eval(value))    
         elif option == '-d':
             dims = eval(value) 
+        elif option == '-D':
+            DIMS = eval(value)    
         elif option == '-e':
             enhance = eval(value)  
-    dispms(filename1,filename2,dims,rgb,enhance)
+    dispms(filename1,filename2,dims,DIMS,rgb,RGB,enhance)
 
 if __name__ == '__main__':
     main()
