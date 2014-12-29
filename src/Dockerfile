@@ -1,12 +1,13 @@
 FROM     debian:jessie
 MAINTAINER Mort Canty "mort.canty@gmail.com"
-ENV     REFRESHED_AT 2014-12-15
+ENV     REFRESHED_AT 2014-12-29
 RUN apt-get update && apt-get install -y \
     python \
     build-essential \
     make \
     gcc \
     pandoc \
+    dos2unix \
     python-dev \
     python-pygments \
     python-pip 
@@ -36,11 +37,12 @@ WORKDIR /crc
 # ipython notebook startup script
 ADD     notebook.sh /
 RUN     chmod u+x /notebook.sh
+RUN     dos2unix /notebook.sh
 
 EXPOSE 8888
 
 # add the Python scripts and set the startup command
-ENV     SCRIPTS_CHANGED 2014-12-27c
+ENV     SCRIPTS_CHANGED 2014-12-28c
 COPY    iMad.py /crc/iMad.py 
 COPY    radcal.py /crc/radcal.py
 COPY    em.py /crc/em.py
@@ -53,3 +55,4 @@ COPY    c_corr.py /crc/c_corr.py
 COPY    dispms.py /crc/dispms.py
 COPY    pca.py /crc/pca.py
 CMD     ["/notebook.sh"]
+

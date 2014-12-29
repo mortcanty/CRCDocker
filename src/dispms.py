@@ -55,7 +55,7 @@ def make_image(redband,greenband,blueband,rows,cols,enhance):
     X[:,2] = np.float32(np.fromstring(b,dtype=np.uint8))
     return np.reshape(X,(rows,cols,3))/255.
 
-def dispms(filename1=None,filename2=None,dims=None,DIMS=None,rgb=None,RGB=None,enhance=None):
+def dispms(filename1=None,filename2=None,dims=None,DIMS=None,rgb=None,RGB=None,enhance=None,ENHANCE=None):
     gdal.AllRegister()
     if filename1 == None:        
         filename1 = raw_input('Enter image filename: ')
@@ -97,7 +97,7 @@ def dispms(filename1=None,filename2=None,dims=None,DIMS=None,rgb=None,RGB=None,e
     elif enhance == 4:
         enhance = 'equalization'
     else:
-        return  
+        enhance = 'linear2pc' 
     try:  
         redband   = np.nan_to_num(inDataset1.GetRasterBand(r).ReadAsArray(x0,y0,cols,rows))
         greenband = np.nan_to_num(inDataset1.GetRasterBand(g).ReadAsArray(x0,y0,cols,rows)) 
@@ -112,11 +112,24 @@ def dispms(filename1=None,filename2=None,dims=None,DIMS=None,rgb=None,RGB=None,e
             DIMS = [0,0,cols2,rows2]
         x0,y0,cols,rows = DIMS
         if RGB == None:
-            RGB = [1,1,1]
+            RGB = rgb
         r,g,b = RGB
         r = np.min([r,bands2])
         g = np.min([g,bands2])
         b = np.min([b,bands2])
+        enhance = ENHANCE
+        if enhance == None:
+            enhance = 3
+        if enhance == 1:
+            enhance = 'linear255'
+        elif enhance == 2:
+            enhance = 'linear'
+        elif enhance == 3:
+            enhance = 'linear2pc'
+        elif enhance == 4:
+            enhance = 'equalization'
+        else:
+            enhance = 'linear2pc'          
         try:  
             redband   = np.nan_to_num(inDataset2.GetRasterBand(r).ReadAsArray(x0,y0,cols,rows))
             greenband = np.nan_to_num(inDataset2.GetRasterBand(g).ReadAsArray(x0,y0,cols,rows))  
@@ -139,11 +152,11 @@ def dispms(filename1=None,filename2=None,dims=None,DIMS=None,rgb=None,RGB=None,e
                       
 
 def main():
-    usage = '''Usage: python %s [-f filename1] [-g filename2] [-p posf] [P posg [-d dimsf] [-D dimsg] [-e enhancement]\n
+    usage = '''Usage: python %s [-f filename1] [-F filename2] [-p posf] [P posg [-d dimsf] [-D dimsg] [-e enhancement]\n
             if -f is not specified it will be queried\n
             RGB bandPositions and spatialDimensions are lists, e.g., -p [1,4,3] -d [0,0,400,400] \n
             enhancements: 1=linear255 2=linear 3=linear2pc 4=equalization\n'''%sys.argv[0]
-    options,args = getopt.getopt(sys.argv[1:],'hf:g:p:P:d:D:e:')
+    options,args = getopt.getopt(sys.argv[1:],'hf:F:p:P:d:D:e:E:')
     filename1 = None
     filename2 = None
     dims = None
@@ -151,13 +164,14 @@ def main():
     DIMS = None
     RGB = None
     enhance = None   
+    ENHANCE = None
     for option, value in options: 
         if option == '-h':
             print usage
             return 
         elif option == '-f':
             filename1 = value
-        elif option == '-g':
+        elif option == '-F':
             filename2 = value    
         elif option == '-p':
             rgb = tuple(eval(value))
@@ -169,7 +183,9 @@ def main():
             DIMS = eval(value)    
         elif option == '-e':
             enhance = eval(value)  
-    dispms(filename1,filename2,dims,DIMS,rgb,RGB,enhance)
+        elif option == '-E':
+            ENHANCE = eval(value)      
+    dispms(filename1,filename2,dims,DIMS,rgb,RGB,enhance,ENHANCE)
 
 if __name__ == '__main__':
     main()
