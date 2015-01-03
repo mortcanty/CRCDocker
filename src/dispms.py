@@ -55,7 +55,7 @@ def make_image(redband,greenband,blueband,rows,cols,enhance):
     X[:,2] = np.float32(np.fromstring(b,dtype=np.uint8))
     return np.reshape(X,(rows,cols,3))/255.
 
-def dispms(filename1=None,filename2=None,dims=None,DIMS=None,rgb=None,RGB=None,enhance=None,ENHANCE=None):
+def dispms(filename1=None,filename2=None,dims=None,DIMS=None,rgb=None,RGB=None,enhance=None,ENHANCE=None,cls=False,CLS=False):
     gdal.AllRegister()
     if filename1 == None:        
         filename1 = raw_input('Enter image filename: ')
@@ -87,7 +87,7 @@ def dispms(filename1=None,filename2=None,dims=None,DIMS=None,rgb=None,RGB=None,e
     b = np.min([b,bands1])
     
     if enhance == None:
-        enhance = 3
+        enhance = 2
     if enhance == 1:
         enhance = 'linear255'
     elif enhance == 2:
@@ -99,10 +99,26 @@ def dispms(filename1=None,filename2=None,dims=None,DIMS=None,rgb=None,RGB=None,e
     else:
         enhance = 'linear2pc' 
     try:  
-        redband   = np.nan_to_num(inDataset1.GetRasterBand(r).ReadAsArray(x0,y0,cols,rows))
-        greenband = np.nan_to_num(inDataset1.GetRasterBand(g).ReadAsArray(x0,y0,cols,rows)) 
-        blueband  = np.nan_to_num(inDataset1.GetRasterBand(b).ReadAsArray(x0,y0,cols,rows))
-        inDataset1 = None
+        if not cls:
+            redband   = np.nan_to_num(inDataset1.GetRasterBand(r).ReadAsArray(x0,y0,cols,rows))
+            greenband = np.nan_to_num(inDataset1.GetRasterBand(g).ReadAsArray(x0,y0,cols,rows)) 
+            blueband  = np.nan_to_num(inDataset1.GetRasterBand(b).ReadAsArray(x0,y0,cols,rows))
+        else:
+            classimg = inDataset1.GetRasterBand(1).ReadAsArray(x0,y0,cols,rows).ravel()
+            ctable = np.reshape(auxil.ctable,(18,3))
+            classes = range(1,np.max(classimg)+1)
+            redband = classimg*0
+            greenband = classimg*0
+            blueband = classimg*0
+            for k in classes:
+                idx = np.where(classimg==k)
+                redband[idx] = ctable[k-1,0]
+                greenband[idx] = ctable[k-1,1]
+                blueband[idx] = ctable[k-1,2]
+            redband = np.reshape(redband,(rows,cols))    
+            greenband = np.reshape(greenband,(rows,cols))
+            blueband = np.reshape(blueband,(rows,cols))
+        inDataset = None   
     except  Exception as e:
         print 'Error in dispms: %s'%e  
         return
@@ -119,7 +135,7 @@ def dispms(filename1=None,filename2=None,dims=None,DIMS=None,rgb=None,RGB=None,e
         b = np.min([b,bands2])
         enhance = ENHANCE
         if enhance == None:
-            enhance = 3
+            enhance = 2
         if enhance == 1:
             enhance = 'linear255'
         elif enhance == 2:
@@ -131,10 +147,26 @@ def dispms(filename1=None,filename2=None,dims=None,DIMS=None,rgb=None,RGB=None,e
         else:
             enhance = 'linear2pc'          
         try:  
-            redband   = np.nan_to_num(inDataset2.GetRasterBand(r).ReadAsArray(x0,y0,cols,rows))
-            greenband = np.nan_to_num(inDataset2.GetRasterBand(g).ReadAsArray(x0,y0,cols,rows))  
-            blueband  = np.nan_to_num(inDataset2.GetRasterBand(b).ReadAsArray(x0,y0,cols,rows))
-            inDataset2 = None
+            if not CLS:
+                redband   = np.nan_to_num(inDataset2.GetRasterBand(r).ReadAsArray(x0,y0,cols,rows))
+                greenband = np.nan_to_num(inDataset2.GetRasterBand(g).ReadAsArray(x0,y0,cols,rows)) 
+                blueband  = np.nan_to_num(inDataset2.GetRasterBand(b).ReadAsArray(x0,y0,cols,rows))
+            else:
+                classimg = inDataset2.GetRasterBand(1).ReadAsArray(x0,y0,cols,rows).ravel()
+                ctable = np.reshape(auxil.ctable,(18,3))
+                classes = range(1,np.max(classimg)+1)
+                redband = classimg*0
+                greenband = classimg*0
+                blueband = classimg*0
+                for k in classes:
+                    idx = np.where(classimg==k)
+                    redband[idx] = ctable[k-1,0]
+                    greenband[idx] = ctable[k-1,1]
+                    blueband[idx] = ctable[k-1,2]
+                redband = np.reshape(redband,(rows,cols))    
+                greenband = np.reshape(greenband,(rows,cols))
+                blueband = np.reshape(blueband,(rows,cols))
+            inDataset = None   
         except  Exception as e:
             print 'Error in dispms: %s'%e  
             return
@@ -152,11 +184,13 @@ def dispms(filename1=None,filename2=None,dims=None,DIMS=None,rgb=None,RGB=None,e
                       
 
 def main():
-    usage = '''Usage: python %s [-f filename1] [-F filename2] [-p posf] [P posg [-d dimsf] [-D dimsg] [-e enhancement]\n
+    usage = '''Usage: python %s [-c] [-C] [-f filename1] [-F filename2] [-p posf] [P posF [-d dimsf] [-D dimsF]\n
+                                        [-e enhancementf] [-E enhancementF\n
             if -f is not specified it will be queried\n
+            use -c or -C for classification image\n 
             RGB bandPositions and spatialDimensions are lists, e.g., -p [1,4,3] -d [0,0,400,400] \n
             enhancements: 1=linear255 2=linear 3=linear2pc 4=equalization\n'''%sys.argv[0]
-    options,args = getopt.getopt(sys.argv[1:],'hf:F:p:P:d:D:e:E:')
+    options,args = getopt.getopt(sys.argv[1:],'hcCf:F:p:P:d:D:e:E:')
     filename1 = None
     filename2 = None
     dims = None
@@ -165,6 +199,8 @@ def main():
     RGB = None
     enhance = None   
     ENHANCE = None
+    cls = False
+    CLS = False
     for option, value in options: 
         if option == '-h':
             print usage
@@ -184,8 +220,13 @@ def main():
         elif option == '-e':
             enhance = eval(value)  
         elif option == '-E':
-            ENHANCE = eval(value)      
-    dispms(filename1,filename2,dims,DIMS,rgb,RGB,enhance,ENHANCE)
+            ENHANCE = eval(value)    
+        elif option == '-c':
+            cls = True  
+        elif option == '-C':
+            CLS = True                
+                    
+    dispms(filename1,filename2,dims,DIMS,rgb,RGB,enhance,ENHANCE,cls,CLS)
 
 if __name__ == '__main__':
     main()
