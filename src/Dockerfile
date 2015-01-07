@@ -16,7 +16,8 @@ RUN apt-get update && apt-get install -y \
 RUN     pip install "ipython[notebook]"
 
 # install python environment for crc scripts
-RUN     apt-get install -y python-numpy python-scipy python-gdal python-matplotlib gdal-bin
+RUN     apt-get install -y python-numpy python-scipy \
+         python-gdal python-matplotlib libgdal-dev python-shapely
 
 # install *latest* mlpy (with MaximumLikelihoodC and LibSvm)
 RUN     apt-get install -y libgsl0-dev

@@ -28,7 +28,7 @@ def main():
 Usage: 
 ---------------------------------------------------------
 python %s  [-p bandPositions] [- c classifier] [-L number of hidden neurons]   
-[-P generate class probabilities image] filename trainingShapefile
+[-P generate class probabilities image] filename trainShapefile
 
 bandPositions is a list, e.g., -p [1,2,4]  
 
