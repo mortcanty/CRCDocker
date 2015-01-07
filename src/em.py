@@ -108,10 +108,10 @@ python %s  [-p "bandPositions"] [-d "spatialDimensions"]
 [-K number of clusters] [-M max scale][-m min scale] 
 [-t initial annealing temperature] [-s spatial mixing factor] 
 [-P generate class probabilities image] filename
---------------------------------------------------------
+
 bandPositions and spatialDimensions are lists, 
 e.g., -p [1,2,4] -d [0,0,400,400]  
---------------------------------------------------------
+
 If the input file is named 
 
          path/filenbasename.ext then
