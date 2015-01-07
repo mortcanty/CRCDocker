@@ -48,7 +48,7 @@ RUN     dos2unix /notebook.sh
 EXPOSE 8888
 
 # add the Python scripts and set the startup command
-ENV     SCRIPTS_CHANGED 2015-01-7a
+ENV     SCRIPTS_CHANGED 2015-01-7f
 COPY    iMad.py /crc/iMad.py 
 COPY    radcal.py /crc/radcal.py
 COPY    em.py /crc/em.py
@@ -56,6 +56,8 @@ COPY    register.py /crc/register.py
 COPY    atwt.py /crc/atwt.py
 COPY    dwt.py /crc/dwt.py
 COPY    classify.py /crc/classify.py
+COPY    ct.py /crc/ct.py
+COPY    mcnemar.py /crc/mcnemar.py
 COPY    normalize /crc/normalize
 COPY    c-correction.sh /crc/c-correction.sh
 COPY    c_corr.py /crc/c_corr.py

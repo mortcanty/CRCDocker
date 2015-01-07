@@ -28,7 +28,7 @@ def main():
 Usage: 
 ---------------------------------------------------------
 python %s  [-p bandPositions] [- c classifier] [-L number of hidden neurons]   
-[-P generate class probabilities image] filename trainShapefile
+[-P generate class probabilities image] [-t testFile] filename trainShapefile
 
 bandPositions is a list, e.g., -p [1,2,4]  
 
@@ -51,19 +51,22 @@ the class probabilities output file is named
          
 and the test results file is named
 
-         path/filebasename_test.txt
+         path/filebasename.tst
 --------------------------------------------------------''' %sys.argv[0]
-    options, args = getopt.getopt(sys.argv[1:],'hPp:c:L:')
+    options, args = getopt.getopt(sys.argv[1:],'hnPp:c:L:')
     pos = None
     probs = False   
     L = 8
     trainalg = 1
+    graphics = True
     for option, value in options:
         if option == '-h':
             print usage
             return
         elif option == '-p':
             pos = eval(value)
+        elif option == '-n':
+            graphics = False            
         elif option == '-c':
             trainalg = eval(value)
         elif option == '-L':
@@ -74,6 +77,14 @@ and the test results file is named
         print 'Incorrect number of arguments'
         print usage
         sys.exit(1)      
+    if trainalg == 1:
+        algorithm = 'MaxLike'
+    elif trainalg == 2:
+        algorithm = 'NNet(Backprop)'
+    elif trainalg ==3:
+        algorithm =  'NNet(Congrad)'
+    else:
+        algorithm = 'SVM'              
     infile = args[0]  
     trnfile = args[1]      
     gdal.AllRegister() 
@@ -103,11 +114,11 @@ and the test results file is named
     path = os.path.dirname(infile)
     basename = os.path.basename(infile)
     root, ext = os.path.splitext(basename)
-    outfile = path+'/'+root+'_class'+ext
-    tstfile = path+'/'+root+'_test'+ext               
+    outfile = '%s/%s_class%s'%(path,root,ext)  
+    tstfile = '%s/%s_%s.tst'%(path,root,algorithm)            
     if (trainalg in (2,3,4)) and probs:
 #      class probabilities file
-        probfile = path+'/'+root+'_classprobs'+ext
+        probfile = '%s/%s_classprobs%s'%(path,root,ext) 
     else:
         probfile = None        
 #  training data        
@@ -131,14 +142,7 @@ and the test results file is named
     print time.asctime()    
     print 'image:    '+infile
     print 'training: '+trnfile  
-    if trainalg == 1:
-        print 'Maximum Likelihood'
-    elif trainalg == 2:
-        print 'Neural Net (Backprop)'
-    elif trainalg ==3:
-        print 'Neural Net (Congrad)'
-    else:
-        print 'Support Vector Machine'               
+    print algorithm             
 #  loop through the polygons    
     Gs = [] # train observations
     ls = [] # class labels
@@ -244,7 +248,7 @@ and the test results file is named
     result = classifier.train()
     print 'elapsed time %s' %str(time.time()-start) 
     if result:
-        if trainalg in [2,3]:
+        if (trainalg in [2,3]) and graphics:
             cost = np.log10(result)  
             ymax = np.max(cost)
             ymin = np.min(cost) 
@@ -281,8 +285,8 @@ and the test results file is named
         if trainalg in [2,3]:
             plt.show()
         if tstfile:
-            with open(tstfile,'w') as f:
-                print >>f, 'FFN test results for %s'%infile
+            with open(tstfile,'w') as f:               
+                print >>f, algorithm +'test results for %s'%infile
                 print >>f, time.asctime()
                 print >>f, 'Classification image: %s'%outfile
                 print >>f, 'Class probabilities image: %s'%probfile
