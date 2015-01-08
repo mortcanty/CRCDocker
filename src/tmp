@@ -13,3 +13,4 @@
 [8221:8259:0108/160736:ERROR:channel.cc(290)] RawChannel read error (connection broken)
 [WARNING:flash/platform/pepper/pep_module.cpp(63)] SANDBOXED
 [8221:8259:0108/163404:ERROR:channel.cc(290)] RawChannel read error (connection broken)
+[WARNING:flash/platform/pepper/pep_module.cpp(63)] SANDBOXED
