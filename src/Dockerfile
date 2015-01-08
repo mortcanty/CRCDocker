@@ -1,6 +1,6 @@
 FROM     debian:jessie
 MAINTAINER Mort Canty "mort.canty@gmail.com"
-ENV     REFRESHED_AT 2015-01-08b
+ENV     REFRESHED_AT 2015-01-08c
 RUN apt-get update && apt-get install -y \
     python \
     build-essential \
@@ -17,7 +17,7 @@ RUN     pip install "ipython[notebook]"
 
 # install python environment for crc scripts
 RUN     apt-get install -y python-numpy python-scipy \
-         python-gdal python-matplotlib libgdal-dev python-shapely
+         python-gdal python-matplotlib libgdal-dev gdal-bin python-shapely
 
 # install *latest* mlpy (with MaximumLikelihoodC and LibSvm)
 RUN     apt-get install -y libgsl0-dev
@@ -42,7 +42,7 @@ RUN     dos2unix /notebook.sh
 EXPOSE 8888
 
 # add the Python scripts and set the startup command
-ENV     SCRIPTS_CHANGED 2015-01-8m
+ENV     SCRIPTS_CHANGED 2015-01-8n
 COPY     dist/auxil-1.1.tar.gz /crc/auxil-1.1.tar.gz
 RUN     tar -xzvf auxil-1.1.tar.gz
 WORKDIR /crc/auxil-1.1
