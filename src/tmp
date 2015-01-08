@@ -1,18 +1,0 @@
-[8221:8318:0108/133059:ERROR:get_updates_processor.cc(240)] PostClientToServerMessage() failed during GetUpdates
-[8221:8221:0108/133100:ERROR:CONSOLE(0)] "Error in event handler for (unknown): TypeError: Cannot read property 'hiding' of undefined
-    at Object.adblock_begin.handleHiding (chrome-extension://gighmmpiobklfepjocnamgkkbiglidom/adblock_start_chrome.js:104:13)
-    at chrome-extension://gighmmpiobklfepjocnamgkkbiglidom/adblock_start_common.js:199:12", source: https://www.google.de/_/chrome/newtab?espv=2&ie=UTF-8 (0)
-[8221:8259:0108/133707:ERROR:connection_factory_impl.cc(344)] Failed to connect to MCS endpoint with error -21
-[WARNING:flash/platform/pepper/pep_module.cpp(63)] SANDBOXED
-[WARNING:flash/platform/pepper/pep_url_request_info.cpp(219)] Missing colon in HTTP header line "".
-[WARNING:flash/platform/pepper/pep_module.cpp(63)] SANDBOXED
-[8221:8259:0108/145520:ERROR:channel.cc(290)] RawChannel read error (connection broken)
-[8221:8259:0108/155420:ERROR:channel.cc(290)] RawChannel read error (connection broken)
-[8221:8318:0108/155431:ERROR:get_updates_processor.cc(240)] PostClientToServerMessage() failed during GetUpdates
-[WARNING:flash/platform/pepper/pep_module.cpp(63)] SANDBOXED
-[8221:8259:0108/160736:ERROR:channel.cc(290)] RawChannel read error (connection broken)
-[WARNING:flash/platform/pepper/pep_module.cpp(63)] SANDBOXED
-[8221:8259:0108/163404:ERROR:channel.cc(290)] RawChannel read error (connection broken)
-[WARNING:flash/platform/pepper/pep_module.cpp(63)] SANDBOXED
-[8221:8221:0108/175115:ERROR:chrome_browser_main_extra_parts_x11.cc(56)] X IO error received (X server probably went away)
-[8262:8262:0108/165115:ERROR:x11_util.cc(81)] X IO error received (X server probably went away)
