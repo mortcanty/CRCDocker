@@ -260,7 +260,7 @@ and the test results file is named
 #      classify the image           
         print 'classifying...'
         start = time.time()
-        tile = np.zeros((cols,N))    
+        tile = np.zeros((cols,N),dtype=np.float32)    
         for row in range(rows):
             for j in range(N):
                 tile[:,j] = rasterBands[j].ReadAsArray(0,row,cols,1)

@@ -134,7 +134,7 @@ class Ffn(object):
         return -np.sum(np.multiply(self._ls,np.log(Ms+1e-20)))
  
 
-epochs = 1000        
+epochs = 2000        
     
 class Ffnbp(Ffn):
     

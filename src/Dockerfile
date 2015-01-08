@@ -1,6 +1,6 @@
 FROM     debian:jessie
 MAINTAINER Mort Canty "mort.canty@gmail.com"
-ENV     REFRESHED_AT 2015-01-05
+ENV     REFRESHED_AT 2015-01-08b
 RUN apt-get update && apt-get install -y \
     python \
     build-essential \
@@ -34,12 +34,6 @@ WORKDIR /crc
 RUN     gcc -shared -Wall -g -o libprov_means.so -fPIC prov_means.c
 RUN     cp libprov_means.so /usr/lib/libprov_means.so
 
-# install auxil package
-ADD     auxil-1.1 /auxil-1.1
-WORKDIR /auxil-1.1
-RUN     python setup.py install   
-WORKDIR /crc 
-
 # ipython notebook startup script
 ADD     notebook.sh /
 RUN     chmod u+x /notebook.sh
@@ -48,7 +42,12 @@ RUN     dos2unix /notebook.sh
 EXPOSE 8888
 
 # add the Python scripts and set the startup command
-ENV     SCRIPTS_CHANGED 2015-01-7f
+ENV     SCRIPTS_CHANGED 2015-01-8n
+COPY     dist/auxil-1.1.tar.gz /crc/auxil-1.1.tar.gz
+RUN     tar -xzvf auxil-1.1.tar.gz
+WORKDIR /crc/auxil-1.1
+RUN     python setup.py install  
+WORKDIR /crc  
 COPY    iMad.py /crc/iMad.py 
 COPY    radcal.py /crc/radcal.py
 COPY    em.py /crc/em.py
@@ -65,4 +64,4 @@ COPY    dispms.py /crc/dispms.py
 COPY    pca.py /crc/pca.py
 ADD     tutorial /crc/tutorial
 CMD     ["/notebook.sh"]
-
+#CMD     ["/bin/bash"]
