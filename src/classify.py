@@ -28,14 +28,14 @@ def main():
 Usage: 
 ---------------------------------------------------------
 python %s  [-p bandPositions] [- c classifier] [-L number of hidden neurons]   
-[-P generate class probabilities image] [-t testFile] filename trainShapefile
+[-P generate class probabilities image] filename trainShapefile
 
 bandPositions is a list, e.g., -p [1,2,4]  
 
-classifier 1=maximum likelihood
-           2=neural net (backpropagation)
-           3=neural net (scaled conjugate gradient)
-           4=support vector machine
+classifier 1=MaxLike
+           2=NNet(backprop)
+           3=NNet(congrad)
+           4=SVM
 
 If the input file is named 
 
@@ -51,7 +51,7 @@ the class probabilities output file is named
          
 and the test results file is named
 
-         path/filebasename.tst
+         path/filebasename_<classifier>.tst
 --------------------------------------------------------''' %sys.argv[0]
     options, args = getopt.getopt(sys.argv[1:],'hnPp:c:L:')
     pos = None

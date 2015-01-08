@@ -14,3 +14,5 @@
 [WARNING:flash/platform/pepper/pep_module.cpp(63)] SANDBOXED
 [8221:8259:0108/163404:ERROR:channel.cc(290)] RawChannel read error (connection broken)
 [WARNING:flash/platform/pepper/pep_module.cpp(63)] SANDBOXED
+[8221:8221:0108/175115:ERROR:chrome_browser_main_extra_parts_x11.cc(56)] X IO error received (X server probably went away)
+[8262:8262:0108/165115:ERROR:x11_util.cc(81)] X IO error received (X server probably went away)
