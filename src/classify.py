@@ -27,12 +27,12 @@ def main():
     usage = '''
 Usage: 
 ---------------------------------------------------------
-python %s  [-p bandPositions] [- c classifier] [-L number of hidden neurons]   
+python %s  [-p bandPositions] [- a algorithm] [-L number of hidden neurons]   
 [-P generate class probabilities image] filename trainShapefile
 
 bandPositions is a list, e.g., -p [1,2,4]  
 
-classifier 1=MaxLike
+algorithm  1=MaxLike
            2=NNet(backprop)
            3=NNet(congrad)
            4=SVM
@@ -53,7 +53,7 @@ and the test results file is named
 
          path/filebasename_<classifier>.tst
 --------------------------------------------------------''' %sys.argv[0]
-    options, args = getopt.getopt(sys.argv[1:],'hnPp:c:L:')
+    options, args = getopt.getopt(sys.argv[1:],'hnPp:a:L:')
     pos = None
     probs = False   
     L = 8
@@ -67,7 +67,7 @@ and the test results file is named
             pos = eval(value)
         elif option == '-n':
             graphics = False            
-        elif option == '-c':
+        elif option == '-a':
             trainalg = eval(value)
         elif option == '-L':
             L = eval(value)    
@@ -81,7 +81,7 @@ and the test results file is named
         algorithm = 'MaxLike'
     elif trainalg == 2:
         algorithm = 'NNet(Backprop)'
-    elif trainalg ==3:
+    elif trainalg == 3:
         algorithm =  'NNet(Congrad)'
     else:
         algorithm = 'SVM'              

@@ -42,8 +42,8 @@ RUN     dos2unix /notebook.sh
 EXPOSE 8888
 
 # add the Python scripts and set the startup command
-ENV     SCRIPTS_CHANGED 2015-01-8n
-COPY     dist/auxil-1.1.tar.gz /crc/auxil-1.1.tar.gz
+ENV     SCRIPTS_CHANGED 2015-01-10
+COPY    dist/auxil-1.1.tar.gz /crc/auxil-1.1.tar.gz
 RUN     tar -xzvf auxil-1.1.tar.gz
 WORKDIR /crc/auxil-1.1
 RUN     python setup.py install  
