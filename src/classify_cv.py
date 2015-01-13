@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 #******************************************************************************
-#  Name:     classify.py
+#  Name:     classify_cv.py
 #  Purpose:  supervised classification of multispectral images
+#            with IPython parallelized cross validation  
 #  Usage:             
-#    python classify.py
-#
+#    python classify_cv.py
+# 
 #  Copyright (c) 2015, Mort Canty
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -22,6 +23,23 @@ from shapely.geometry import asPolygon, MultiPoint
 import matplotlib.pyplot as plt
 import shapely.wkt  
 import numpy as np
+from IPython.parallel import Client
+
+
+def crossvalidate((Gstrn,lstrn,Gstst,lstst,L,trainalg)):
+    import auxil.supervisedclass as sc
+    if   trainalg == 1:
+        classifier = sc.Maxlike(Gstrn,lstrn)
+    elif trainalg == 2:
+        classifier = sc.Ffnbp(Gstrn,lstrn,L)
+    elif trainalg == 3:
+        classifier = sc.Ffncg(Gstrn,lstrn,L)
+    elif trainalg == 4:
+        classifier = sc.Svm(Gstrn,lstrn)       
+    if classifier.train():
+        return classifier.test(Gstst,lstst)
+    else:
+        return None
  
 def main():    
     usage = '''
@@ -57,8 +75,8 @@ and the test results file is named
     pos = None
     probs = False   
     L = 8
-    trainalg = 1
     graphics = True
+    trainalg = 1
     for option, value in options:
         if option == '-h':
             print usage
@@ -83,7 +101,7 @@ and the test results file is named
         algorithm = 'NNet(Backprop)'
     elif trainalg == 3:
         algorithm =  'NNet(Congrad)'
-    else:
+    elif trainalg == 4:
         algorithm = 'SVM'              
     infile = args[0]  
     trnfile = args[1]      
@@ -200,20 +218,15 @@ and the test results file is named
     print str(m) + ' training pixel vectors were read in' 
     Gs = np.array(Gs) 
     ls = np.array(ls)
-#  stretch the pixel vectors to [-1,1] for ffn
+#  stretch the pixel vectors to [-1,1] (for ffn)
     maxx = np.max(Gs,0)
     minx = np.min(Gs,0)
     for j in range(N):
-        Gs[:,j] = 2*(Gs[:,j]-minx[j])/(maxx[j]-minx[j]) - 1.0 
+        Gs[:,j] = 2*(Gs[:,j]-minx[j])/(maxx[j]-minx[j]) - 1.0   
 #  random permutation of training data
     idx = np.random.permutation(m)
     Gs = Gs[idx,:] 
-    ls = ls[idx,:]     
-#  train on 2/3 training examples         
-    Gstrn = Gs[0:2*m//3,:]
-    lstrn = ls[0:2*m//3,:] 
-    Gstst = Gs[2*m//3:,:]  
-    lstst = ls[2*m//3:,:]               
+    ls = ls[idx,:]             
 #  setup output datasets 
     driver = inDataset.GetDriver() 
     outDataset = driver.Create(outfile,cols,rows,1,GDT_Byte) 
@@ -235,15 +248,15 @@ and the test results file is named
             probBands.append(probDataset.GetRasterBand(k+1))         
 #  initialize classifier  
     if   trainalg == 1:
-        classifier = sc.Maxlike(Gstrn,lstrn)
+        classifier = sc.Maxlike(Gs,ls)
     elif trainalg == 2:
-        classifier = sc.Ffnbp(Gstrn,lstrn,L)
+        classifier = sc.Ffnbp(Gs,ls,L)
     elif trainalg == 3:
-        classifier = sc.Ffncg(Gstrn,lstrn,L)
+        classifier = sc.Ffncg(Gs,ls,L)
     elif trainalg == 4:
-        classifier = sc.Svm(Gstrn,lstrn)         
+        classifier = sc.Svm(Gs,ls)         
 #  train it            
-    print 'training on %i pixel vectors...' % np.shape(Gstrn)[0]
+    print 'training on %i pixel vectors...' % np.shape(Gs)[0]
     start = time.time()
     result = classifier.train()
     print 'elapsed time %s' %str(time.time()-start) 
@@ -256,7 +269,8 @@ and the test results file is named
             plt.plot(range(xmax),cost,'k')
             plt.axis([0,xmax,ymin-1,ymax])
             plt.title('Log(Cross entropy)')
-            plt.xlabel('Epoch')              
+            plt.xlabel('Epoch')   
+            plt.show()
 #      classify the image           
         print 'classifying...'
         start = time.time()
@@ -280,27 +294,27 @@ and the test results file is named
                 probBand.FlushCache() 
             probDataset = None
             print 'class probabilities written to: %s'%probfile   
-        K =  lstrn.shape[1]+1                     
+        K =  ls.shape[1]+1                     
         print 'thematic map written to: %s'%outfile
-        if trainalg in [2,3]:
-            plt.show()
-        if tstfile:
-            with open(tstfile,'w') as f:               
-                print >>f, algorithm +'test results for %s'%infile
-                print >>f, time.asctime()
-                print >>f, 'Classification image: %s'%outfile
-                print >>f, 'Class probabilities image: %s'%probfile
-                print >>f, lstst.shape[0],lstst.shape[1]
-                classes, _ = classifier.classify(Gstst)
-                labels = np.argmax(lstst,axis=1)+1
-                for i in range(len(classes)):
-                    print >>f, classes[i], labels[i]              
-                f.close()
-                print 'test results written to: %s'%tstfile
-        print 'done'
     else:
         print 'an error occured' 
         return 
+      
+    start = time.time()
+    rc = Client()   
+    print 'submitting cross-validation to %i IPython engines'%len(rc)  
+    m = np.shape(Gs)[0]
+    traintest = []
+    for i in range(10):
+        sl = slice(i*m//10,(i+1)*m//10)
+        traintest.append( (np.delete(Gs,sl,0),np.delete(ls,sl,0), \
+                                     Gs[sl,:],ls[sl,:],L,trainalg) )
+    v = rc[:]   
+    v.execute('import auxil.supervisedclass as sc') 
+    result = v.map(crossvalidate,traintest).get()   
+    print 'parallel execution time: %s' %str(time.time()-start)      
+    print 'misclassification rate: %f' %np.mean(result)
+    print 'standard deviation:     %f' %np.std(result)         
    
 if __name__ == '__main__':
     main()
