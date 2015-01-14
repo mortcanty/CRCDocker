@@ -47,9 +47,17 @@ container as a daemon serving iPython notebooks. </p>
 
 <p>Point your browser to http://localhost:433 to see the iPython notebook home page.</p>
 
-<p>Here are some <a href="http://ms-image-analysis.appspot.com/static/homepage/CRCDockerExamples.html">examples</a>.</p>
+Here is a <a href="http://ms-image-analysis.appspot.com/static/homepage/tutorial.html">tutorial</a>
 
-<p>And here are some <a href="http://ms-image-analysis.appspot.com/static/homepage/CRCDockerExamples1.html">more examples</a>.</p>
+and here are some examples:
+<p>
+1, 2. <a href="http://ms-image-analysis.appspot.com/static/homepage/CRCDockerExamples.html">Automatic radiometric normalization, Unsupervised clustering</a>.</p>
+
+<p>3. <a href="http://ms-image-analysis.appspot.com/static/homepage/CRCDockerExamples1.html">Solar illumination correction</a>.</p>
+
+<p>4. <a href="http://ms-image-analysis.appspot.com/static/homepage/CRCDockerExamples4.html">Supervised land cover classification</a>.</p>
+
+<p>5. <a href="http://ms-image-analysis.appspot.com/static/homepage/CRCDockerExamples5.html">Parallel processing for cross-validation</a>.</p>
 
       </section>
     </div>
