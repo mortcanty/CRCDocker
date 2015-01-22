@@ -129,12 +129,15 @@ and the test results file is named
 #  coordinate transformation from training to image projection   
     ct = osr.CoordinateTransformation(trnsr,imsr) 
 #  number of classes    
+    K = 1
     feature = trnLayer.GetNextFeature() 
     while feature:
         classid = feature.GetField('CLASS_ID')
+        if int(classid)>K:
+            K = int(classid)
         feature = trnLayer.GetNextFeature() 
     trnLayer.ResetReading()    
-    K = int(classid)+1       
+    K += 1        
 #  es kann losgehen    
     print '========================='
     print 'supervised classification'
@@ -151,7 +154,7 @@ and the test results file is named
     print 'reading training data...'
     for i in range(trnLayer.GetFeatureCount()):
         feature = trnLayer.GetFeature(i)
-        classid = feature.GetField('CLASS_ID')
+        classid = str(feature.GetField('CLASS_ID'))
         classname  = feature.GetField('CLASS_NAME')
         if classid not in classids:
             classnames += ',   '+ classname
