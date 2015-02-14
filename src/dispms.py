@@ -82,9 +82,9 @@ def dispms(filename1=None,filename2=None,dims=None,DIMS=None,rgb=None,RGB=None,e
     if rgb == None:
         rgb = [1,1,1]
     r,g,b = rgb
-    r = np.min([r,bands1])
-    g = np.min([g,bands1])
-    b = np.min([b,bands1])
+    r = int(np.min([r,bands1]))
+    g = int(np.min([g,bands1]))
+    b = int(np.min([b,bands1]))
     
     if enhance == None:
         enhance = 2
@@ -130,9 +130,9 @@ def dispms(filename1=None,filename2=None,dims=None,DIMS=None,rgb=None,RGB=None,e
         if RGB == None:
             RGB = rgb
         r,g,b = RGB
-        r = np.min([r,bands2])
-        g = np.min([g,bands2])
-        b = np.min([b,bands2])
+        r = int(np.min([r,bands2]))
+        g = int(np.min([g,bands2]))
+        b = int(np.min([b,bands2]))
         enhance = ENHANCE
         if enhance == None:
             enhance = 2

@@ -1,6 +1,6 @@
 FROM     debian:jessie
 MAINTAINER Mort Canty "mort.canty@gmail.com"
-ENV     REFRESHED_AT 2015-01-08c
+ENV     REFRESHED_AT 2015-01-22
 RUN apt-get update && apt-get install -y \
     python \
     build-essential \
