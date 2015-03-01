@@ -75,7 +75,7 @@ For ENVI files, ext1 or ext2 is the empty string.
     root1, ext1 = os.path.splitext(basename1)
     basename2 = os.path.basename(fn2)
     root2, ext2 = os.path.splitext(basename2)
-    outfn = path + '/' + 'MAD(%s-%s)%s'%(root1,root2,ext1)     
+    outfn = path + '/' + 'MAD(%s-%s)%s'%(root1,basename2,ext1)     
     inDataset1 = gdal.Open(fn1,GA_ReadOnly)     
     inDataset2 = gdal.Open(fn2,GA_ReadOnly) 
     try:   

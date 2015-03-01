@@ -89,10 +89,11 @@ Note that, for ENVI format, ext is the empty string.
     root, ext = os.path.splitext(basename)
     b = root.find('(')
     e = root.find(')')
-    referenceroot, targetroot = root[b+1:e].split('-')
+    referenceroot, targetbasename = root[b+1:e].split('-')
     referencefn = path + '/' + referenceroot + ext
-    targetfn = path + '/' + targetroot + ext
-    outfn = path + '/' + targetroot + '_norm' + ext
+    targetfn = path + '/' + targetbasename
+    targetroot, targetext = os.path.splitext(targetbasename)
+    outfn = path + '/' + targetroot + '_norm' + targetext
     imadDataset = gdal.Open(imadfn,GA_ReadOnly)    
     try:
         imadbands = imadDataset.RasterCount 
