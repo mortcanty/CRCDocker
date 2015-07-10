@@ -5,7 +5,7 @@
 #
 # Usage:
 #
-#  ./c-correction spatialDims bandPos numClasses solarAzimuth solarElevation msImage demImage
+#  ./c-correction.sh spatialDims bandPos numClasses solarAzimuth solarElevation msImage demImage
 echo 
 echo "=================================================="
 echo "                  C-Correction"
