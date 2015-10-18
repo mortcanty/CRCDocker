@@ -15,6 +15,13 @@ RUN apt-get update && apt-get install -y \
 # ipython notebook
 RUN     pip install "ipython[notebook]"
 
+# enable parallel computing
+RUN     pip install ipyparallel
+RUN     jupyter notebook --generate-config
+RUN     sed -i "/# Configuration file for jupyter-notebook./a  \ 
+                c.NotebookApp.server_extensions.append('ipyparallel.nbextension')" \
+            /root/.jupyter/jupyter_notebook_config.py
+
 # install python environment for crc scripts
 RUN     apt-get install -y python-numpy python-scipy \
          python-gdal python-matplotlib libgdal-dev gdal-bin python-shapely
