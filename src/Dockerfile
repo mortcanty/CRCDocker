@@ -1,6 +1,6 @@
 FROM     debian:jessie
 MAINTAINER Mort Canty "mort.canty@gmail.com"
-ENV     REFRESHED_AT 2015-01-22
+ENV     REFRESHED_AT 2015-12-10
 RUN apt-get update && apt-get install -y \
     python \
     build-essential \
@@ -36,8 +36,8 @@ RUN     python setup.py install
 RUN     apt-get install -y python-tk
 
 # setup the prov_means library
-COPY    prov_means.c /crc/prov_means.c
-WORKDIR /crc
+COPY    prov_means.c /home/prov_means.c
+WORKDIR /home
 RUN     gcc -shared -Wall -g -o libprov_means.so -fPIC prov_means.c
 RUN     cp libprov_means.so /usr/lib/libprov_means.so
 
@@ -49,26 +49,29 @@ RUN     dos2unix /notebook.sh
 EXPOSE 8888
 
 # add the Python scripts and set the startup command
-ENV     SCRIPTS_CHANGED 2015-01-12k
-COPY    dist/auxil-1.1.tar.gz /crc/auxil-1.1.tar.gz
+ENV     SCRIPTS_CHANGED 2015-12-09
+COPY    dist/auxil-1.1.tar.gz /home/auxil-1.1.tar.gz
 RUN     tar -xzvf auxil-1.1.tar.gz
-WORKDIR /crc/auxil-1.1
+WORKDIR /home/auxil-1.1
 RUN     python setup.py install  
-COPY    iMad.py /crc/iMad.py 
-COPY    radcal.py /crc/radcal.py
-COPY    em.py /crc/em.py
-COPY    register.py /crc/register.py
-COPY    atwt.py /crc/atwt.py
-COPY    dwt.py /crc/dwt.py
-COPY    classify.py /crc/classify.py
-COPY    classify_cv.py /crc/classify_cv.py
-COPY    ct.py /crc/ct.py
-COPY    mcnemar.py /crc/mcnemar.py
-COPY    normalize /crc/normalize
-COPY    c-correction.sh /crc/c-correction.sh
-COPY    c_corr.py /crc/c_corr.py
-COPY    dispms.py /crc/dispms.py
-COPY    pca.py /crc/pca.py
-ADD     tutorial /crc/tutorial
-WORKDIR /crc  
+WORKDIR /home
+RUN     rm -rf auxil-1.1
+RUN     rm auxil-1.1.tar.gz
+COPY    iMad.py /home/iMad.py 
+COPY    radcal.py /home/radcal.py
+COPY    em.py /home/em.py
+COPY    register.py /home/register.py
+COPY    atwt.py /home/atwt.py
+COPY    dwt.py /home/dwt.py
+COPY    classify.py /home/classify.py
+COPY    classify_cv.py /home/classify_cv.py
+COPY    ct.py /home/ct.py
+COPY    mcnemar.py /home/mcnemar.py
+COPY    normalize /home/normalize
+COPY    c-correction.sh /home/c-correction.sh
+COPY    c_corr.py /home/c_corr.py
+COPY    dispms.py /home/dispms.py
+COPY    pca.py /home/pca.py
+ADD     tutorial /home/tutorial
+WORKDIR /home  
 CMD     ["/notebook.sh"]

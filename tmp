@@ -1,3 +1,0 @@
-[2837:2934:0106/125113:ERROR:get_updates_processor.cc(240)] PostClientToServerMessage() failed during GetUpdates
-[2837:2875:0106/125332:ERROR:channel.cc(290)] RawChannel read error (connection broken)
-[WARNING:flash/platform/pepper/pep_module.cpp(63)] SANDBOXED
