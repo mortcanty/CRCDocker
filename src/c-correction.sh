@@ -22,15 +22,15 @@ demPixelSize=$(gdalinfo $7 | grep Pixel | awk '{print $4}')
 echo Image pixel size: $imagePixelSize
 echo DEM pixel size: $demPixelSize	   
 echo 'PCA... '
-pcaImage=$(python /crc/pca.py -n -d $1 -p $2 $6 | tee /dev/tty \
+pcaImage=$(python /home/pca.py -n -d $1 -p $2 $6 | tee /dev/tty \
 	   | grep written \
 	   | awk '{print $4}')
 dims=$(echo $1 | sed -e 's/\[[0-9]*\,[0-9]*/[0,0/')
 echo 'Gaussian clustering...'
-classImage=$(python /crc/em.py -d $dims -p [1,2,3] -K $3 $pcaImage | tee /dev/tty \
+classImage=$(python /home/em.py -d $dims -p [1,2,3] -K $3 $pcaImage | tee /dev/tty \
 	   | grep written \
 	   | awk '{print $5}')
 echo   Slope and aspect...
-python /crc/c_corr.py -d $1 -p $2 -c $classImage $4 $5 $6 $7 | tee /dev/tty \
+python /home/c_corr.py -d $1 -p $2 -c $classImage $4 $5 $6 $7 | tee /dev/tty \
 	   | grep written \
 	   | awk '{print $5}'

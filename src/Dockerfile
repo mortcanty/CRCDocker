@@ -1,6 +1,11 @@
-FROM     debian:jessie
+# x86 architecture 
+FROM     debian:jessie  
+           
+# arm (raspberry pi) architecture       
+#FROM     resin/rpi-raspbian 
+
 MAINTAINER Mort Canty "mort.canty@gmail.com"
-ENV     REFRESHED_AT 2015-12-10
+ENV     REFRESHED_AT 2015-12-26
 RUN apt-get update && apt-get install -y \
     python \
     build-essential \
@@ -24,7 +29,8 @@ RUN     sed -i "/# Configuration file for jupyter-notebook./a  \
 
 # install python environment for crc scripts
 RUN     apt-get install -y python-numpy python-scipy \
-         python-gdal python-matplotlib libgdal-dev gdal-bin python-shapely
+         python-gdal python-matplotlib libgdal-dev gdal-bin python-shapely \
+         python-opencv
 
 # install *latest* mlpy (with MaximumLikelihoodC and LibSvm)
 RUN     apt-get install -y libgsl0-dev
@@ -33,7 +39,7 @@ WORKDIR /mlpy-3.5.0
 RUN     python setup.py install
 
 # package imported by auxil package (but not used)
-RUN     apt-get install -y python-tk
+RUN     apt-get install -y python-tk 
 
 # setup the prov_means library
 COPY    prov_means.c /home/prov_means.c
@@ -63,6 +69,7 @@ COPY    em.py /home/em.py
 COPY    register.py /home/register.py
 COPY    atwt.py /home/atwt.py
 COPY    dwt.py /home/dwt.py
+COPY    canny.py /home/canny.py
 COPY    classify.py /home/classify.py
 COPY    classify_cv.py /home/classify_cv.py
 COPY    ct.py /home/ct.py
@@ -72,6 +79,7 @@ COPY    c-correction.sh /home/c-correction.sh
 COPY    c_corr.py /home/c_corr.py
 COPY    dispms.py /home/dispms.py
 COPY    pca.py /home/pca.py
+COPY    subset.py /home/subset.py
 ADD     tutorial /home/tutorial
 WORKDIR /home  
 CMD     ["/notebook.sh"]
