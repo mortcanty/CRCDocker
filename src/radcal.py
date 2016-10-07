@@ -112,12 +112,25 @@ Note that, for ENVI format, ext is the empty string.
         x0,y0,cols,rows = dims          
     chisqr = imadDataset.GetRasterBand(imadbands).ReadAsArray(0,0,cols,rows).ravel()
     ncp = 1 - stats.chi2.cdf(chisqr,[imadbands-1])
-    idx = where(ncp>ncpThresh)
+    idx = where(ncp>ncpThresh)[0]
+    
+    m = len(idx)
+    
+    idx1 = random.permutation(m)
+    
+    idxall = idx[idx1]
+    
+    idxtrain = idxall[0:2*m//3]
+    idxtest = idxall[2*m//3:]
+    mtrain = len(idxtrain)
+    mtest = len(idxtest)
+    
+    
     print time.asctime() 
     print 'reference: '+referencefn
     print 'target   : '+targetfn   
     print 'no-change probability threshold: '+str(ncpThresh)
-    print 'no-change pixels: '+str(len(idx[0]))  
+    print 'no-change pixels for training: %i, for testing: %i' %(mtrain,mtest) 
     start = time.time()           
     driver = targetDataset.GetDriver()    
     outDataset = driver.Create(outfn,cols,rows,len(pos),GDT_Float32)
@@ -136,12 +149,11 @@ Note that, for ENVI format, ext is the empty string.
     for k in pos:
         x = referenceDataset.GetRasterBand(k).ReadAsArray(x0,y0,cols,rows).astype(float).ravel()
         y = targetDataset.GetRasterBand(k).ReadAsArray(x0,y0,cols,rows).astype(float).ravel()
-        b,a,R = orthoregress(y[idx],x[idx])
-        print 'band: %i  slope: %f  intercept: %f  correlation: %f'%(k,b,a,R)
-        my = max(y[idx])
+        b,a,R = orthoregress(y[idxtrain],x[idxtrain])
+        my = max(y[idxtrain])
         if (j<7) and graphics:
             plt.subplot(2,3,j)
-            plt.plot(y[idx],x[idx],'.')
+            plt.plot(y[idxtrain],x[idxtrain],'.')
             plt.plot([0,my],[a,a+b*my])
             plt.title('Band %i'%k)
             if ((j<4) and (bands<4)) or j>3:
@@ -150,7 +162,13 @@ Note that, for ENVI format, ext is the empty string.
                 plt.ylabel('Reference')
         aa.append(a)
         bb.append(b)     
-        outBand = outDataset.GetRasterBand(j)
+        outBand = outDataset.GetRasterBand(j)       
+        _,Pt = stats.ttest_ind(x[idxtest],a+b*y[idxtest])
+        f = var(x[idxtest])/var(a+b*y[idxtest])  
+        if f < 1.0:
+            f = 1/f   
+        Pf = stats.f.sf(f,mtest-1,mtest-1)      
+        print 'band: %i  slope: %f  intercept: %f  corr: %f  P(t-test): %f  P(F-test): %f' %(k,b,a,R,Pt,Pf)       
         outBand.WriteArray(resize(a+b*y,(rows,cols)),0,0) 
         outBand.FlushCache()
         j += 1
