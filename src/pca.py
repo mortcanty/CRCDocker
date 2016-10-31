@@ -22,18 +22,22 @@ import matplotlib.pyplot as plt
 from osgeo.gdalconst import GA_ReadOnly,GDT_Float32
 
 def main(): 
-    usage = '''Usage: python %s  [-d dims] [-p pos] fileName\n
-            spatial and spectral dimensions are lists, e.g., -d [0,0,400,400] \n'''%sys.argv[0]
-    options,args = getopt.getopt(sys.argv[1:],'hnd:p:')
+    usage = '''Usage: python %s [-h] [-r N] [-n] [-d dims] [-p pos] fileName\n
+            spatial and spectral dimensions are lists, e.g., -d [0,0,400,400] \n
+            use -r N to reconstuct image with first N pcs, use -n to disable graphics output'''%sys.argv[0]
+    options,args = getopt.getopt(sys.argv[1:],'hr:nd:p:')
     dims = None
     pos = None
     graphics = True
+    recon = 0
     for option, value in options: 
         if option == '-h':
             print usage
             return 
         elif option == '-n':
             graphics = False
+        elif option == '-r':
+            recon = eval(value)          
         elif option == '-d':
             dims = eval(value)  
         elif option == '-p':
@@ -43,7 +47,8 @@ def main():
     path = os.path.dirname(infile)
     basename = os.path.basename(infile)
     root, ext = os.path.splitext(basename)
-    outfile = path+'/'+root+'_pca'+ext    
+    outfile = path+'/'+root+'_pca'+ext  
+    outfile1 = path+'/'+root+'_recon'+ext  
     print '------------PCA ---------------'
     print time.asctime()     
     print 'Input %s'%infile
@@ -92,7 +97,11 @@ def main():
         plt.show()
         plt.close()                  
 #  project
-    PCs = np.reshape(np.array(G*U),(rows,cols,bands))       
+    pcs = np.array(G*U)
+    PCs = np.reshape(pcs,(rows,cols,bands)) 
+    if recon > 0:  
+        grs = np.array(pcs[:,:recon]*U[:,:recon].T)  
+        GRs = np.reshape(grs,(rows,cols,bands))
 #  write to disk       
     driver = inDataset.GetDriver() 
     outDataset = driver.Create(outfile,
@@ -110,9 +119,24 @@ def main():
         outBand = outDataset.GetRasterBand(k+1)
         outBand.WriteArray(PCs[:,:,k],0,0) 
         outBand.FlushCache() 
+    print 'PCs written to: %s'%outfile    
+    if recon > 0:
+        outDataset = driver.Create(outfile1,
+                    cols,rows,bands,GDT_Float32)
+        if geotransform is not None:
+            gt = list(geotransform)
+            gt[0] = gt[0] + x0*gt[1]
+            gt[3] = gt[3] + y0*gt[5]
+            outDataset.SetGeoTransform(tuple(gt))
+        if projection is not None:
+            outDataset.SetProjection(projection)        
+        for k in range(bands):        
+            outBand = outDataset.GetRasterBand(k+1)
+            outBand.WriteArray(GRs[:,:,k],0,0) 
+            outBand.FlushCache() 
+        print 'Reconstruction wrriten to: %s'%outfile1        
     outDataset = None    
-    inDataset = None        
-    print 'result written to: %s'%outfile
+    inDataset = None           
     print 'elapsed time: %s'%str(time.time()-start) 
      
 if __name__ == '__main__':
